@@ -1,0 +1,17 @@
+# Archivos auxiliares de LaTeX; los PDF finales se versionan.
+*.aux
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.synctex(busy)
+*.bak
+*.bbl
+*.blg
+*.nav
+*.snm
+*.vrb

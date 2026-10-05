@@ -1,0 +1,289 @@
+% !TEX program = pdflatex
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage[a4paper,margin=2.35cm]{geometry}
+\usepackage{fancyhdr}
+\usepackage{lmodern,xcolor,amsmath,amssymb,mathtools,tcolorbox}
+\usepackage[hidelinks]{hyperref}
+\usepackage{booktabs,array,tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usepackage{enumitem}
+\setlist[itemize]{topsep=0pt, partopsep=0pt}
+\definecolor{inkred}{HTML}{E84C4F}
+\definecolor{palered}{HTML}{FFF1F1}
+\definecolor{pencilgray}{HTML}{999999}
+\definecolor{markpink}{HTML}{F2A7AC}
+\definecolor{markyellow}{HTML}{F3D66E}
+\pagestyle{plain}
+\makeatletter
+\renewcommand\section{\@startsection{section}{1}{\z@}{-1em}{0.4em}
+ {\normalfont\large\bfseries\color{inkred}}}
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}{-0.7em}{0.25em}
+ {\normalfont\normalsize\bfseries\color{inkred}}}
+\makeatother
+\setlength{\parindent}{0pt}\setlength{\parskip}{0.5\baselineskip}
+\setlength{\leftmargini}{1.35em}
+\newenvironment{apuntebox}[1]{\begin{tcolorbox}[colback=palered,colframe=inkred,
+ boxrule=0.7pt,arc=0mm,left=0.8em,right=0.8em,top=0.45em,bottom=0.45em]
+ \textcolor{inkred}{\textbf{#1}}\quad}{\end{tcolorbox}}
+\newcommand{\rojo}[1]{\textcolor{inkred}{#1}}
+\newcommand{\gris}[1]{\textcolor{pencilgray}{#1}}
+\newcommand{\E}{\mathbb{E}}\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\newcommand{\Th}{\Theta}
+\tikzset{decision/.style={circle,fill=black,inner sep=1.5pt},
+ nature/.style={circle,draw=black,inner sep=1.5pt},
+ branch/.style={draw=black,line width=.55pt},
+ infoset/.style={draw=black,dashed,line width=.65pt},
+ lab/.style={font=\small},paylab/.style={font=\scriptsize,align=center}}
+
+%----------------------------------------------------------------------------------------
+% HEADER
+%----------------------------------------------------------------------------------------
+
+\pagestyle{fancy}
+\fancyhf{}
+
+\fancyhead[L]{Octavio Sivori}
+\fancyhead[R]{Micro II}
+\fancyfoot[C]{\thepage}
+
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+\setlength{\headheight}{14.5pt}
+
+
+% Estilos y figuras de las fuentes de Microeconomía II.
+\usetikzlibrary{backgrounds,calc,babel,shapes.geometric}
+\definecolor{violeta}{HTML}{932AAF}
+\definecolor{resaltado}{HTML}{E9C9FA}
+\definecolor{dorado}{HTML}{C99F00}
+\definecolor{cyanman}{HTML}{0086A2}
+\definecolor{juguno}{HTML}{ADA5EE}
+\definecolor{jugdos}{HTML}{FFCF91}
+\definecolor{jugtres}{HTML}{FFF990}
+\newcommand{\mor}[1]{\textcolor{violeta}{#1}}
+\newcommand{\oro}[1]{\textcolor{dorado}{#1}}
+\newcommand{\src}[1]{{\footnotesize\gris{Fuente: #1.}}\par}
+\newcommand{\nota}[1]{{\footnotesize\textit{Nota de transcripción: #1}}\par}
+\newcommand{\fc}[1]{{\small\gris{#1}}\par}
+\newcommand{\br}[1]{\underline{#1}}
+\newcommand{\cellcirc}[1]{\tikz[baseline=(p.base)]{\node[draw=violeta,ellipse,inner xsep=3pt,inner ysep=1.2pt,line width=.8pt](p){$#1$};}}
+\newcommand{\brcolor}[2]{\tikz[baseline=(v.base)]{\node[inner sep=0pt,outer sep=0pt](v){$#2$};\draw[#1,line width=.5pt]([yshift=-1pt]v.south west)--([yshift=-1pt]v.south east);}}
+\tikzset{dot/.style={circle,fill=black,inner sep=1.8pt},edge/.style={line width=.7pt},lab/.style={fill=white,inner sep=2pt,font=\small},j1/.style={circle,draw,fill=juguno,minimum size=7mm,inner sep=1pt},j2/.style={circle,draw,fill=jugdos,minimum size=7mm,inner sep=1pt},j3/.style={circle,draw,fill=jugtres,minimum size=7mm,inner sep=1pt}}
+% Árbol entrada, información perfecta: geometría de la fuente.
+\newcommand{\entrada}{\begin{tikzpicture}[x=1cm,y=1cm,edge]
+\node[dot,label=above:{$(E)$}] (e) at (0,0) {};
+\node[dot,label=left:{$(I)$}] (i) at (0,-1.6) {};
+\node[dot,label=right:{$(0,2)$}] (o) at (2.6,0) {};
+\node[dot,label=below:{$(-3,-1)$}] (l) at (-1.7,-3) {};
+\node[dot,label=below:{$(2,1)$}] (r) at (1.7,-3) {};
+\draw(e)--node[above]{$-E$}(o);\draw(e)--node[right]{$E$}(i);
+\draw(i)--node[above left]{$G$}(l);\draw(i)--node[above right]{$-G$}(r);
+\end{tikzpicture}}
+\newcommand{\entradados}{\begin{tikzpicture}[edge]
+\node[dot,label=above:{$(E)$}] (a) at (0,0) {};
+\node[dot,label=right:{$(0,2)$}] (z) at (3,0) {};
+\node[dot,label=left:{$(E)$}] (b) at (0,-1.5) {};
+\node[dot,label=above left:{$(I)$}] (c) at (-2,-3) {};
+\node[dot,label=above right:{$(I)$}] (d) at (2,-3) {};
+\draw(a)--node[above]{$-E$}(z);\draw(a)--node[right]{$E$}(b);
+\draw(b)--node[above left]{$P$}(c);\draw(b)--node[above right]{$-P$}(d);
+\draw[dashed](c)--(d);
+\draw(c)--node[above left]{$P$}(-3,-4.3) node[below]{$(-3,-1)$};
+\draw(c)--node[above right]{$-P$}(-1,-4.3) node[below]{$(1,-2)$};
+\draw(d)--node[above left]{$P$}(1,-4.3) node[below]{$(-2,-1)$};
+\draw(d)--node[above right]{$-P$}(3,-4.3) node[below]{$(3,1)$};
+\end{tikzpicture}}
+\newcommand{\cadena}[2]{\begin{tikzpicture}[edge]
+\ifnum#2=1\begin{scope}[on background layer]\draw[resaltado,line width=7pt,line cap=round](0,0)--(0,-1.5);\draw[resaltado,line width=7pt,line cap=round](2.5,0)--(7.5,0);\end{scope}\fi
+\node[dot,label=above:{$(1)$}](a) at(0,0){};
+\draw(a)--node[right]{$T$}(0,-1.5) node[dot,label=below:{$(3,3)$}]{};
+\ifnum#1>1
+\node[dot,label=above:{$(2)$}](b) at(2.5,0){};\draw(a)--node[above]{$C$}(b);
+\draw(b)--node[right]{$T$}(2.5,-1.5) node[dot,label=below:{$(10,0)$}]{};
+\ifnum#1>2
+\node[dot,label=above:{$(1)$}](c) at(5,0){};\draw(b)--node[above]{$C$}(c);
+\draw(c)--node[right]{$T$}(5,-1.5) node[dot,label=below:{$(1,-10)$}]{};
+\draw(c)--node[above]{$C$}(7.5,0) node[dot,label=right:{$(2,1)$}]{};
+\else\draw(b)--node[above]{$C$}(5,0) node[dot,label=right:{$(2,1)$}]{};\fi
+\else\draw(a)--node[above]{$C$}(2.5,0) node[dot,label=right:{$(2,1)$}]{};\fi
+\end{tikzpicture}}
+\newcommand{\batalla}[1]{\begin{tikzpicture}[edge]
+\ifnum#1=1\begin{scope}[on background layer]\draw[resaltado,line width=7pt,line cap=round](0,0)--(-1.7,-1.15)--(-2.6,-2.4);\draw[resaltado,line width=7pt,line cap=round](1.7,-1.15)--(2.6,-2.4);\end{scope}\fi
+\node[dot,label=above:{$1$}](a) at(0,0){};
+\node[dot,label=above left:{$2$}](b) at(-1.7,-1.15){};\node[dot,label=above right:{$2$}](c) at(1.7,-1.15){};
+\draw(a)--node[above left]{$B$}(b);\draw(a)--node[above right]{$P$}(c);
+\draw(b)--node[above left]{$B$}(-2.6,-2.4) node[below]{$(2,1)$};\draw(b)--node[above right]{$P$}(-.8,-2.4) node[below]{$(0,0)$};
+\draw(c)--node[above left]{$B$}(.8,-2.4) node[below]{$(0,0)$};\draw(c)--node[above right]{$P$}(2.6,-2.4) node[below]{$(1,2)$};
+\end{tikzpicture}}
+\newcommand{\infoarbol}[1]{\begin{tikzpicture}[edge,scale=.95]
+\node[dot,label=above:{$(1)\ \mor{H_1^1}$}](a) at(0,0){};
+\node[dot,label=above left:{$(2)$}](b) at(-1.8,-1.4){};\node[dot,label=above right:{$(2)$}](c) at(1.8,-1.4){};
+\draw(a)--(b);\draw(a)--(c);
+\foreach \n/\xx in {d/-2.8,e/-.8,f/.8,g/2.8}{\node[dot,label=above:{$(1)$}](\n) at(\xx,-2.9){};\draw(\n)--(\xx-.45,-3.9);\draw(\n)--(\xx+.45,-3.9);}
+\draw(b)--(d);\draw(b)--(e);\draw(c)--(f);\draw(c)--(g);
+\ifnum#1=0
+\node[cyanman]at(-2.9,-.95){$H_2^1$};\node[cyanman]at(2.9,-.95){$H_2^2$};
+\foreach \xx/\k in {-3.5/2,-1.5/3,1.5/4,3.5/5}\node[violeta]at(\xx,-2.45){$H_1^\k$};
+\else
+\draw[dashed](b)--(c);\draw[dashed](d)--(e);\draw[dashed](f)--(g);
+\node[cyanman]at(-2.9,-.95){$H_2^1$};\node[violeta]at(-3.5,-2.45){$H_1^3$};\node[violeta]at(3.5,-2.45){$H_1^4$};
+\fi
+\end{tikzpicture}}
+\begin{document}
+\section{Juegos dinámicos y equilibrio perfecto en subjuegos}
+\renewcommand{\br}[1]{\brcolor{cyanman}{#1}}
+\subsection{Juegos dinámicos con información completa}
+\begin{apuntebox}{Definición. Juego dinámico}
+En al menos una instancia al menos un jugador observa la decisión de otro antes de jugar. \rojo{$\Rightarrow$ Quien juega primero es clave.}
+\end{apuntebox}
+
+
+\begin{apuntebox}{Definición. Información perfecta}
+Un juego en forma extensiva es un juego con \rojo{información perfecta} si todo conjunto de información $h\in H$ tiene un solo elemento: \gris{$\#h=1\ \forall h\in H$}.
+\begin{itemize}\item Antes de jugar, todos saben qué pasó hasta justo ese momento.\item Cada conjunto informativo tiene un único nodo.\end{itemize}
+\end{apuntebox}
+\begin{apuntebox}{Definición. Información imperfecta}
+En un juego con \rojo{información imperfecta}, al menos un jugador, en al menos una instancia, mueve en un conjunto informativo de más de un nodo: ignora algo ocurrido previamente.
+\end{apuntebox}
+
+\begin{center}\begin{minipage}{\linewidth}\centering\infoarbol{0}\par\fc{M1a. Información perfecta: $\#H_i^j=1$ para todo $i,j$.}\end{minipage}\end{center}
+\begin{center}\begin{minipage}{\linewidth}\centering\infoarbol{1}\par\fc{M1b. Información imperfecta: $\#H_2^1=2$, $\#H_1^3=2$, $\#H_1^4=2$.}\end{minipage}\end{center}
+\begin{apuntebox}{Definición. Estrategia pura}
+En un juego $\Gamma_E$, una \rojo{estrategia pura} para un jugador $i$ es una función
+\[s_i:H_i\longrightarrow A\quad\text{tal que}\quad s_i(h_i)\in A(h_i)\quad\forall h_i\in H_i,\]
+\gris{con $H_i=\{h\in H:\iota(h)=i\}$: conjuntos de información donde juega $i$.}
+\end{apuntebox}
+
+
+\textbf{Ejemplo: entry deterrence.}
+\begin{center}\begin{minipage}{\linewidth}\centering\entrada\par\fc{M1c. Árbol del ejemplo de entrada.}\end{minipage}\end{center}
+\[\begin{array}{c|cc}(E)\backslash(I)&G&-G\\\hline E&-3,-1&\br2,\br1\\-E&\br0,\br2&0,\br2\end{array}\]
+\[EN=\{(-E,G),(E,-G)\}.\]
+Pero ¿son los dos igual de plausibles? Es decir, ¿es \rojo{creíble} que el incumbente haga la guerra? No\ldots\ Recurrimos a otro principio.
+\renewcommand{\br}[1]{\brcolor{violeta}{#1}}
+\subsection{Racionalidad secuencial e inducción hacia atrás}
+\rojo{\textbf{Principio de racionalidad secuencial:}} la estrategia de un jugador debe especificar elecciones óptimas en cada conjunto de información $h_i\in H_i$, dado lo que hacen sus rivales.
+\begin{itemize}\item \rojo{Idea:} su estrategia debe ser óptima en cada punto del árbol \gris{(consistencia)}.\item Con \rojo{inducción hacia atrás}$^{(*)}$ nos garantizamos que este principio se cumple.\end{itemize}
+\textbf{Ejemplo: batalla de los sexos.}
+\[\begin{array}{c|cc}&B&P\\\hline B&\br2,\br1&0,0\\P&0,0&\br1,\br2\end{array}\qquad EN:\{(B,B),(P,P),(\sigma_1,\sigma_2)\}.\]
+¿Qué pasa si lo volvemos secuencial? Ahora, SPG, $s_1=a$ y $s_2=(\underbrace{\_}_{B},\underbrace{\_}_{P})$.
+\[\begin{array}{c|cccc}&BB&BP&PB&PP\\\hline B&\br2,\br1&\br2,\br1&\br0,0&0,0\\P&0,0&1,\br2&\br0,\br0&\br1,\br2\end{array}\]
+\[\Rightarrow EN=\{(B;B,B),(B;B,P),(P;P,P)\}.\]
+EN refinado $\equiv$ IHA: los jugadores deben optimizar en cada $H_i$.
+\begin{center}\begin{minipage}{\linewidth}\centering\batalla{0}\par\fc{M2a. Batalla de los sexos secuencial.}\end{minipage}\end{center}
+\begin{center}\begin{minipage}{\linewidth}\centering\begin{tikzpicture}[edge]
+\node[dot,label=above:{$1$}](a)at(0,0){};
+\draw(a)--node[above left]{$B$}(-1.5,-1.25) node[dot,label=above left:{$2$},label=below:{\mor{$(2,1)$}}]{};
+\draw(a)--node[above right]{$P$}(1.5,-1.25) node[dot,label=above right:{$2$},label=below:{\mor{$(1,2)$}}]{};
+\node[violeta]at(-2.6,-1.8){$a_2=B$};\node[violeta]at(2.6,-1.8){$a_2=P$};
+\end{tikzpicture}\par\fc{M2b. Árbol reducido.}\end{minipage}\end{center}
+\begin{center}\begin{minipage}{\linewidth}\centering\batalla{1}\par\fc{M2c. Árbol con las elecciones óptimas resaltadas en violeta.}\end{minipage}\end{center}
+\[\Rightarrow\mathrm{IHA}:\{(B;B,P)\}.\]
+\gris{$(*)$ Más sobre esto: para juegos dinámicos, finitos e información perfecta.}
+
+\rojo{\textbf{INDUCCIÓN HACIA ATRÁS.}} Idea: buscar estrategias óptimas de atrás (últimos nodos) hacia adelante (primeros nodos) $\longrightarrow$ garantizo consistencia.
+
+\rojo{\textbf{Proceso:}}
+\begin{enumerate}\item Elegir el óptimo de los jugadores en los últimos nodos de decisión, aquellos que tienen como sucesores nodos terminales.\end{enumerate}
+\subsection{Proceso, Zermelo e información imperfecta}
+\begin{enumerate}[start=2]\item Reemplazar esos nodos por los pagos asociados a lo que eligen en (1).\item Tomando esos pagos como dados, elegir óptimamente qué harán en el siguiente nodo (hacia arriba).\item Repetir hasta encontrar solución al juego.\end{enumerate}
+\gris{Nota al margen: vamos reduciendo juego.}
+\begin{apuntebox}{Teorema de Zermelo} Cada juego $\Gamma_E$ finito de información perfecta tiene un EN en puras que puede derivarse de IHA. Si no hay empates, $\#EN=1$.
+\end{apuntebox}
+\gris{\textbf{Ejemplo:}}
+\begin{center}\begin{minipage}{\linewidth}\centering\cadena{3}{1}\par\fc{M3a. Ejemplo con elecciones óptimas resaltadas: $T$ inicial y los dos últimos $C$.}\end{minipage}\end{center}
+\[\Rightarrow\mathrm{IHA}=\{(TC,C)\}.\]
+El \rojo{proceso de inducción hacia atrás} permite eliminar EN a los cuales nunca se llegaría en juegos secuenciales.
+
+\rojo{Restricción:} solo aplica en juegos finitos con información perfecta. Entonces... juegos donde en un momento se juegue algo estático queda excluidos. Para aplicar racionalidad secuencial en un contexto más general recurrimos al \rojo{equilibrio en subjuegos perfecto}. Pasamos al caso de \rojo{información imperfecta}.
+
+\gris{\textbf{Ejemplo:}}
+\begin{center}\begin{minipage}{\linewidth}\centering\entradados\par\fc{M3b. Entrada con información imperfecta.}\end{minipage}\end{center}
+\[s_E\in\{(-E,P),(-E,-P),(E,P),(E,-P)\},\qquad s_I\in\{P,-P\}.\]
+\[\Gamma_N:\quad\begin{array}{c|cccc}&-E,P&-E,-P&E,P&E,-P\\\hline P&\cellcirc{\br2,\br0}&\cellcirc{\br2,\br0}&\brcolor{violeta}{-1},-3&-1,-2\\-P&\br2,0&2,0&-2,1&\cellcirc{\br1,\br3}\end{array}\]
+\subsection{Subjuegos y ESP}
+\[\Rightarrow EN:\{(-E,-P;P),(-E,P;P),(E,-P;-P)\}.\]
+Si exigimos racionalidad secuencial, primero debemos encontrar el EN del simultáneo:
+\[\begin{array}{c|cc}(E)\backslash(I)&P&-P\\\hline P&-3,\brcolor{violeta}{-1}&1,-2\\-P&\brcolor{violeta}{-2},-1&\cellcirc{\br3,\br1}\end{array}\]
+\[\Rightarrow EN=\{(-P,-P)\}.\]
+Por lo que nos sonaría que el EN ``más plausible'' es $(E,-P;-P)$. Para captar la lógica de racionalidad secuencial en juegos donde no hay información perfecta usamos el ESP.
+
+\begin{apuntebox}{Definición. Subjuego}
+Un \rojo{subjuego} es una parte del juego que se puede analizar de forma independiente. Formal:
+\begin{itemize}\item Comienza en un $H_i$: $\#H_i=1$ (conjunto de información unitario), y contiene a todos sus sucesores.\item Si $x\in$ a un subjuego $\Rightarrow\forall x'\in H(x)\in$ al subjuego.\end{itemize}
+\end{apuntebox}
+\begin{center}\begin{minipage}{\linewidth}\centering\begin{tikzpicture}[edge,draw=pencilgray,text=pencilgray,scale=.85]
+\node(a)at(0,0){$(1)$};\node(b)at(-1.6,-1.15){$(2)$};\node(c)at(1.6,-1.15){$(2)$};
+\draw(a)--(b);\draw(a)--(c);
+\foreach \n/\xx in {d/-2.5,e/-.7,f/.7,g/2.5}{\node(\n)at(\xx,-2.4){$(3)$};\draw(\n)--(\xx-.45,-3.5);\draw(\n)--(\xx+.45,-3.5);}
+\draw(b)--(d);\draw(b)--(e);\draw(c)--(f);\draw(c)--(g);\draw[dashed](d)--(g);
+\draw[black,line width=1pt](1.7,-2.5) ellipse (1.55 and 1.75);
+\draw[->,black](2.8,-1.3)--(4.1,-.8);\node[text=black,align=left,anchor=west]at(4.1,-.8){Este caso no es\\un subjuego.};
+\end{tikzpicture}\par\fc{M4a. La región señalada corta un conjunto de información.}\end{minipage}\end{center}
+\begin{center}\begin{minipage}{\linewidth}\centering\begin{tikzpicture}[edge,draw=pencilgray,text=pencilgray]
+\node(a)at(0,0){$(1)$};\node(b)at(-1.1,-1){$(2)$};\node(c)at(1.1,-1){$(2)$};
+\draw(a)--(b);\draw(a)--(c);\draw[dashed](b)--(c);
+\draw(b)--node[left]{$x$}(-1.9,-2);\draw(b)--node[right]{$y$}(-.3,-2);\draw(c)--node[left]{$w$}(.3,-2);\draw(c)--node[right]{$z$}(1.9,-2);
+\node at(2,-.8){$H_2^1$};
+\end{tikzpicture}\par\fc{M4b. Esquema ilustrativo manuscrito.}\end{minipage}\end{center}
+\gris{$\Rightarrow x\in H_2^1,\in$ subjuego. Dado que $y,w,z\in H_2^1=H(x)\Rightarrow\in$ subjuego.}
+\begin{apuntebox}{Definición. Equilibrio perfecto en subjuegos}
+Un perfil de estrategias $\sigma^*=(\sigma_i^*,\sigma_{-i}^*)$ es un \rojo{equilibrio perfecto en subjuegos} (ESP) en caso de que induzca un equilibrio de Nash en cada subjuego de $\Gamma_E$.
+\end{apuntebox}
+
+
+\textbf{Notar:}
+\begin{itemize}\item $ESP\subseteq EN$. Es un refinamiento.\item IHA es un ESP en juegos secuenciales con información perfecta.\item En juegos estáticos, todo el juego es un subjuego $\Rightarrow ESP=EN$.\end{itemize}
+\rojo{\textbf{Proceso}} (juegos $<\infty\longrightarrow$ terminan).
+\subsection{Proceso generalizado y Rubinstein}
+\begin{enumerate}\item Comenzar en el final del árbol e identificar los EN de los últimos subjuegos.\item Reemplazar estos últimos subjuegos por los pagos del EN encontrado. Si son varios, uno por uno.\item Repetir hasta que cada movimiento de la forma extensiva quede determinado. La colección de estos movimientos constituye un ESP.\end{enumerate}
+Se lo suele llamar \rojo{proceso de inducción hacia atrás generalizado}.
+
+Entonces, panorama hasta acá sobre ESP:
+\[\begin{array}{c|cc}&\text{Información perfecta}&\text{Información imperfecta}\\\hline\text{Finitos}&\mathrm{IHA}&\mathrm{IHA\ generalizada}\\\text{Infinitos}&??&??\end{array}\]
+Veamos cómo resuelve \rojo{Rubinstein} un modelo de negociación \rojo{infinito}.
+
+\textbf{Dinámica:}
+\begin{itemize}
+\item J1 propone un reparto $(s_1,1-s_1)$, $s_1\in[0,1]$.
+\item J2 puede rechazar y proponer $(\delta_1s_2,\delta_2-\delta_2s_2)$, $s_2\in[0,1]$, o acepta y se termina el juego. \gris{$\delta_2(1-s_2)$}
+\item J1 puede rechazar y proponer $(\delta_1^2s,\delta_2^2(1-s))$, $s\in[0,1]$, o acepta y se termina el juego.
+\item $\vdots$\quad NANANA.
+\end{itemize}
+\begin{apuntebox}{Definiciones. Pagos en la negociación de Rubinstein}
+\begin{itemize}
+\item $\overline V_1$: máximo pago que puede recibir J1 en un ESP si le toca proponer. \gris{Le ofrece lo mínimo a J2 para que acepte.}
+\item $\underline V_1$: mínimo pago que puede recibir J1 en un ESP si le toca proponer. \gris{Ofrece teniendo en cuenta el máximo pago posible de J2 en $t+1$.}
+\item $\overline W_2$: máximo pago que puede recibir J2 en un ESP si le toca proponer.
+\item $\underline W_2$: mínimo pago que puede recibir J2 en un ESP si le toca proponer.
+\end{itemize}
+\end{apuntebox}
+Entonces:
+\[\begin{cases}\overline V_1\leq1-\delta_2\underline W_2,\\\underline W_2\geq1-\delta_1\overline V_1.\end{cases}\]
+\gris{$\Rightarrow$ Si J2 rechaza, propone mañana. Y sabe que consigue AL MENOS $\delta_2\underline W_2$.}
+
+\gris{$\Rightarrow$ Si J1 rechaza, sabe que mañana puede llevarse, como máximo, $\delta_1\underline V_1$.}
+\[\Rightarrow\quad\overline V_1\leq1-\delta_2(1-\delta_1\overline V_1).\]
+\subsection{Cotas, estrategias y crítica}
+\begin{align*}\overline V_1&\leq1-\delta_2+\delta_1\delta_2\overline V_1,\\\overline V_1(1-\delta_1\delta_2)&\leq1-\delta_2,\\\overline V_1&\leq\frac{1-\delta_2}{1-\delta_1\delta_2}.\end{align*}
+Del mismo modo:
+\[\begin{cases}\underline V_1\geq1-\delta_2\overline W_2,\\\overline W_2\leq1-\delta_1\underline V_1,\end{cases}\quad\Rightarrow\quad\underline V_1\geq\frac{1-\delta_2}{1-\delta_1\delta_2}.\]
+\[\Longleftrightarrow\quad\overline V_1=\underline V_1=\frac{1-\delta_2}{1-\delta_1\delta_2}\quad\Longleftrightarrow\quad\overline W_2=\underline W_2=\frac{1-\delta_1}{1-\delta_1\delta_2}.\]
+De esta manera:
+\begin{apuntebox}{ESP}
+J1 ofrece
+\[\left(\frac{1-\delta_2}{1-\delta_1\delta_2},1-\frac{1-\delta_2}{1-\delta_1\delta_2}\right).\]
+Acepta si $\displaystyle s_2\geq\frac{\delta_1(1-\delta_1)}{1-\delta_1\delta_2}$.
+
+J2 ofrece
+\[\left(\frac{\delta_1(1-\delta_1)}{1-\delta_1\delta_2},1-\frac{\delta_1(1-\delta_1)}{1-\delta_1\delta_2}\right).\]
+Acepta si $\displaystyle s_1\leq\frac{1-\delta_2}{1-\delta_1\delta_2}$.
+\end{apuntebox}
+\rojo{\textbf{Crítica al ESP:}} el ESP supone CCR y de la selección de equilibrio. No captura escenarios donde los jugadores tienen creencias distintas.
+
+\rojo{Solución:} equilibrio bayesiano de Nash / perfecto.
+\end{document}

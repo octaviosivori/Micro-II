@@ -1,0 +1,255 @@
+% !TEX program = pdflatex
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage[a4paper,margin=2.35cm]{geometry}
+\usepackage{fancyhdr}
+\usepackage{lmodern,xcolor,amsmath,amssymb,mathtools,tcolorbox}
+\usepackage[hidelinks]{hyperref}
+\usepackage{booktabs,array,tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usepackage{enumitem}
+\setlist[itemize]{topsep=0pt, partopsep=0pt}
+\definecolor{inkred}{HTML}{E84C4F}
+\definecolor{palered}{HTML}{FFF1F1}
+\definecolor{pencilgray}{HTML}{999999}
+\definecolor{markpink}{HTML}{F2A7AC}
+\definecolor{markyellow}{HTML}{F3D66E}
+\pagestyle{plain}
+\makeatletter
+\renewcommand\section{\@startsection{section}{1}{\z@}{-1em}{0.4em}
+ {\normalfont\large\bfseries\color{inkred}}}
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}{-0.7em}{0.25em}
+ {\normalfont\normalsize\bfseries\color{inkred}}}
+\makeatother
+\setlength{\parindent}{0pt}\setlength{\parskip}{0.5\baselineskip}
+\setlength{\leftmargini}{1.35em}
+\newenvironment{apuntebox}[1]{\begin{tcolorbox}[colback=palered,colframe=inkred,
+ boxrule=0.7pt,arc=0mm,left=0.8em,right=0.8em,top=0.45em,bottom=0.45em]
+ \textcolor{inkred}{\textbf{#1}}\quad}{\end{tcolorbox}}
+\newcommand{\rojo}[1]{\textcolor{inkred}{#1}}
+\newcommand{\gris}[1]{\textcolor{pencilgray}{#1}}
+\newcommand{\E}{\mathbb{E}}\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\newcommand{\Th}{\Theta}
+\tikzset{decision/.style={circle,fill=black,inner sep=1.5pt},
+ nature/.style={circle,draw=black,inner sep=1.5pt},
+ branch/.style={draw=black,line width=.55pt},
+ infoset/.style={draw=black,dashed,line width=.65pt},
+ lab/.style={font=\small},paylab/.style={font=\scriptsize,align=center}}
+
+%----------------------------------------------------------------------------------------
+% HEADER
+%----------------------------------------------------------------------------------------
+
+\pagestyle{fancy}
+\fancyhf{}
+
+\fancyhead[L]{Octavio Sivori}
+\fancyhead[R]{Micro II}
+\fancyfoot[C]{\thepage}
+
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+\setlength{\headheight}{14.5pt}
+
+%----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
+
+\usepackage{graphicx}
+\AtBeginDocument{\shorthandoff{<>}}
+\usetikzlibrary{svg.path}
+\definecolor{notesgold}{HTML}{BDA126}
+\definecolor{notesorange}{HTML}{E99820}
+\newcommand{\gold}[1]{\textcolor{notesgold}{#1}}
+\newcommand{\orange}[1]{\textcolor{notesorange}{#1}}
+\newcommand{\fuente}[1]{\par{\small\gris{#1}}\par}
+\newenvironment{notebox}{\begin{tcolorbox}[colback=white,colframe=notesgold,boxrule=0pt,leftrule=.9pt,arc=0pt,left=.7em,right=.3em,top=.3em,bottom=.3em]}{\end{tcolorbox}}
+\newcommand{\best}[1]{\begingroup\setbox0=\hbox{$#1$}\textcolor{red}{\underline{\textcolor{black}{\box0}}}\endgroup}
+\newcommand{\cellcirc}[1]{\tikz[baseline=(p.base)]{\node[draw=red,ellipse,inner xsep=3pt,inner ysep=1pt](p){$#1$};}}
+\usetikzlibrary{shapes.geometric}
+\begin{document}
+\begin{center}
+{\LARGE\bfseries\rojo{Juegos Repetidos}}\quad
+\gris{($\subset$ Juegos dinámicos)}
+\end{center}
+\fuente{Apuntes manuscritos: 5. Juegos IV, páginas 1--5.}
+La principal pregunta es si se puede sostener como equilibrio algo distinto al EN estático.
+
+\section{Juegos repetidos finitas veces}
+En la última etapa, tienen que jugar un EN sí o sí. No hay incentivos a ``seguir cooperando''.
+\begin{apuntebox}{Proposición.} Si un juego $G$ es tal que \rojo{$\exists!$ EN} y se repite un número \rojo{finito} de veces, el \rojo{único ESP} es el EN de $G$.
+\end{apuntebox}
+¿Qué pasa cuando el EN \underline{no es único}?
+
+Supongamos:
+\begin{center}\renewcommand{\arraystretch}{1.35}
+$\begin{array}{c|c|c|c|}
+ &L_2&M_2&R_2\\\cline{2-4}
+L_1&\cellcirc{1,1}&\best{5},0&0,0\\\cline{2-4}
+M_1&0,\best{5}&4,4&0,0\\\cline{2-4}
+R_1&0,0&0,0&\cellcirc{3,3}\\\cline{2-4}
+\end{array}$
+\end{center}
+Y quisiéramos sostener $(M_1,M_2)$ dado que $\max\sum_i V_i$, $\forall i$.
+
+Podemos proponer:
+\begin{quote}
+$s_1$: empezar con $M_1$. Si en la primera etapa el resultado fue $(M_1,M_2)$, juega $R_1$. Si no, $L_1$.
+
+$s_2$: empezar con $M_2$. Si en la primera etapa el resultado fue $(M_1,M_2)$, juega $R_2$. Si no, $L_2$.
+\end{quote}
+Y garantizamos que en la última etapa juegan un EN. Hace falta chequear que es un EN del juego completo.
+\begin{center}\renewcommand{\arraystretch}{1.3}
+$\begin{array}{c|c|c|c|}
+ &L_2&M_2&R_2\\\cline{2-4}
+L_1&1+1,1+1&5+1,0+1&0+1,0+1\\\cline{2-4}
+M_1&0+1,5+1&4+3,4+3&0+1,0+1\\\cline{2-4}
+R_1&0+1,0+1&0+1,0+1&3+1,3+1\\\cline{2-4}
+\end{array}$
+\par$\Downarrow$\par
+$\begin{array}{c|c|c|c|}
+ &L_2&M_2&R_2\\\cline{2-4}
+L_1&\best{2},\best{2}&6,1&1,1\\\cline{2-4}
+M_1&1,6&\cellcirc{7,7}&1,1\\\cline{2-4}
+R_1&1,1&1,1&\best{4},\best{4}\\\cline{2-4}
+\end{array}$
+\end{center}
+$\Rightarrow$ EN: $\{(M_1,M_2),\ldots\}$. Podemos sostener en alguna etapa algo $\neq$ al EN estático.
+
+\section{Juegos repetidos infinitas veces}
+Arrancamos con el dilema del prisionero donde los jugadores descuentan la utilidad con $\delta$.
+\begin{center}\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{c c|c|c|}
+&&$c$&$-c$\\\cline{3-4}
+$(1)$&$c$&$\cellcirc{-4,-4}$&$\best{0},-5$\\\cline{3-4}
+&$-c$&$-5,\best{0}$&$-1,-1$\\\cline{3-4}
+\end{tabular}\quad $(2)$
+\end{center}
+Si juegan siempre $(c,c)$:
+\[
+S_n=-4+(-4)\delta+(-4)\delta^2+\cdots=\frac{-4}{1-\delta}.
+\]
+Si juegan siempre $(-c,-c)$:
+\[
+S_n=-1+(-1)\delta+(-1)\delta^2+\cdots=\frac{-1}{1-\delta}.
+\]
+¿Podemos conseguir que jueguen siempre $(-c,-c)$?
+
+\subsection{Estrategias trigger}
+\begin{apuntebox}{Definición. Estrategia trigger} En un juego infinito, una \rojo{estrategia trigger} para el jugador $i$ es:
+\[
+s_i(h^t)=
+\begin{cases}
+a_i^c &\text{si nadie se desvió en }T=1,\ldots,t-1,\\
+a_i^p &\text{si algún desvío fue observado en algún }T.
+\end{cases}
+\]
+\gris{$h^t$: historia en $t$.}
+\end{apuntebox}
+Estrategia trigger en el dilema del prisionero:
+\begin{quote}
+Empieza con $-c$. Si en todos los períodos anteriores el resultado fue $(-c,-c)$, juega $c$. Si en algún período fue distinto, juega $c$.
+\end{quote}
+Chequeamos que $\nexists$ incentivos al desvío con la $s_i$:
+\[
+u_i^{eq}=\frac{-1}{1-\delta},\qquad
+u_i^{\text{desvío}}=0-4\delta+(-4)\delta^2+\cdots=\frac{-4\delta}{1-\delta}.
+\]
+No se desvía si
+\[
+\frac{-1}{1-\delta}\geq\frac{-4\delta}{1-\delta}
+\quad\Longrightarrow\quad 1\leq4\delta
+\quad\Longrightarrow\quad\delta\geq\frac14.
+\]
+Si $\delta\geq\frac14$, la estrategia trigger constituye un EN.
+
+\underline{Otro ejemplo:} Cournot repetido infinitas veces.
+\begin{quote}
+Empiezo con $\dfrac{q^M}{2}=\dfrac{a-c}{4}$.
+
+Si en todas las etapas el resultado fue $\left(\dfrac{a-c}{4},\dfrac{a-c}{4}\right)$, sigo produciendo $\dfrac{a-c}{4}$.
+
+Si no, produzco $\dfrac{a-c}{3}$.
+\end{quote}
+Constituye un EN si $\delta\geq9/17$.
+
+\underline{Otro ejemplo:} Bertrand repetido infinitas veces.
+\begin{quote}
+Empiezo con $p_i=\dfrac{a+c}{2}$.
+
+Si en todas las etapas el resultado fue $\left(\dfrac{a+c}{2},\dfrac{a+c}{2}\right)$, sigo jugando $\dfrac{a+c}{2}$.
+
+Si no, juego $c$.
+\end{quote}
+Constituye un EN si $\delta\geq1/2$.
+
+\subsection{Pagos socialmente posibles y teoremas de Folk}
+\begin{apuntebox}{Teorema de Folk} Si $G$ es un juego \rojo{estático, finito} y con \rojo{información completa}, cualquier vector de pagos \rojo{socialmente posible} donde cada jugador gana más que lo que gana en un EN estático puede ser sostenido como un \rojo{ESP} del juego repetido \rojo{infinitas veces} si $\delta\simeq1$.
+\end{apuntebox}
+\begin{apuntebox}{Definición. Pago socialmente posible} Un pago socialmente posible es una combinación convexa de todos los pagos del juego.
+\end{apuntebox}
+En el dilema del prisionero, los pagos socialmente posibles donde se gana más que en el EN están dados por:
+\begin{center}
+\begin{tikzpicture}[x=.9cm,y=.9cm,font=\small]
+\draw[->](-5.8,0)--(.85,0)node[right]{$u_1$};
+\draw[->](0,-5.8)--(0,.8)node[above]{$u_2$};
+\fill[notesgold,opacity=.28](-4,-.25)--(-1,-1)--(-.25,-4)--(-4,-4)--cycle;
+\draw[notesgold,line width=1.2pt](-4,-.25)--(-4,-4)--(0,-4);
+\draw[red,line width=1pt](-5,0)--(-1,-1)--(0,-5)--(-4,-4)--cycle;
+\foreach \x in {-4,-1}{\draw(\x,.1)--(\x,-.1)node[above=6pt]{$\x$};}
+\foreach \y in {-4,-1}{\draw(-.1,\y)--(.1,\y)node[right=3pt]{$\y$};}
+\fill(-5,0)circle(1.8pt)node[above left]{$(-5,0)$};
+\fill(-1,-1)circle(1.8pt)node[below left=3pt]{$(-1,-1)$};
+\fill(-4,-4)circle(1.8pt)node[below left]{$(-4,-4)$};
+\fill(0,-5)circle(1.8pt)node[right]{$(0,-5)$};
+\end{tikzpicture}
+\end{center}
+\begin{apuntebox}{Teorema de Fudenberg y Maskin} Si la dimensión del conjunto de pagos socialmente posibles es igual al número de jugadores, entonces \rojo{cualquier pago} socialmente posible en el que \rojo{todos} los jugadores reciban más que su \rojo{MINMAX} puede sostenerse como un \rojo{ESP} del juego repetido $\infty$ veces si son suficientemente pacientes.
+\end{apuntebox}
+\subsection{MINMAX}
+\begin{apuntebox}{Definición. MINMAX} MINMAX es la utilidad de reserva.
+\[
+\min_{\sigma_{-i}}\max_{\sigma_i} V_i(\sigma_i,\sigma_{-i})
+=\min_{\sigma_{-i}}V_i\bigl(\sigma_i(\sigma_{-i}),\sigma_{-i}\bigr).
+\]
+\end{apuntebox}
+\gris{Ejemplo:}
+\begin{center}\renewcommand{\arraystretch}{1.25}
+$\begin{array}{c|c|c|}&A&B\\\cline{2-3}1&-2&1\\\cline{2-3}2&1&-2\\\cline{2-3}3&0&0\\\cline{2-3}\end{array}$
+\end{center}
+Supongamos que $J_2$ castiga al $J_1$, no le importan sus pagos. El MINMAX para 1 surge de:
+\[
+v_1=\min_{\sigma_2}\max_{\sigma_1}u_1(\sigma_1,\sigma_2).
+\]
+I)\quad $u_1(1\mid q)=-2q+1(1-q)=1-3q$,
+\[
+u_1(2\mid q)=1q-2(1-q)=3q-2,\qquad u_1(3\mid q)=0.
+\]
+\[
+\Rightarrow\quad BR_1(q)=\max\{1-3q,3q-2,0\}.
+\]
+II)\quad $J_2$ resuelve
+\[
+\min_{\{q\}}\max\{1-3q,3q-2,0\}.
+\]
+\[
+\Longleftrightarrow\quad q\in\left[\frac13,\frac23\right].
+\]
+\begin{center}
+\begin{tikzpicture}[x=5cm,y=2.5cm,font=\small]
+\draw[->](0,0)--(1.15,0)node[right]{$q$};
+\draw[->](0,0)--(0,1.4)node[above]{$u_1$};
+\draw[line width=.8pt](0,1)--(1/3,0)--(2/3,0)--(1,1);
+\draw(-.025,1)--(.025,1)node[left=5pt]{$1$};
+\foreach \x/\l in {0.333333/{1/3},0.666667/{2/3}}{\draw(\x,.03)--(\x,-.03)node[below=3pt]{$\l$};}
+\end{tikzpicture}
+\end{center}
+\underline{Comments:}
+\begin{itemize}
+\item MINMAX es el máximo castigo que \#2 le puede imponer a \#1.
+\item En \rojo{TODO EN estático}, cada jugador recibe al menos su MINMAX.
+\item En el \rojo{juego repetido $\infty$ veces}, si el jugador juega la BR del estático, no puede recibir menos que el MINMAX.
+\item En \rojo{ESP} NADIE recibe menos que el MINMAX.
+\end{itemize}
+\end{document}

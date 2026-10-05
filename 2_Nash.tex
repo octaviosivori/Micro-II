@@ -1,0 +1,627 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage[a4paper,margin=2.35cm]{geometry}
+\usepackage{lmodern,xcolor,amsmath,amssymb,mathtools,tcolorbox}
+\usepackage[hidelinks]{hyperref}
+\usepackage{booktabs,array,tikz}
+\usepackage{fancyhdr,enumitem}
+\usetikzlibrary{decorations.pathreplacing,patterns,arrows.meta,calc,shapes.geometric}
+\setlist[itemize]{topsep=0pt,partopsep=0pt}
+\definecolor{inkred}{HTML}{E84C4F}
+\definecolor{palered}{HTML}{FFF1F1}
+\definecolor{pencilgray}{HTML}{999999}
+\definecolor{inkblue}{HTML}{2196FF}
+\definecolor{cyanink}{HTML}{00A5C8}
+\definecolor{orangeink}{HTML}{FF7618}
+\definecolor{purpleink}{HTML}{8C249C}
+\definecolor{paleblue}{HTML}{D2EBFF}
+\pagestyle{plain}
+\makeatletter
+\renewcommand\section{\@startsection{section}{1}{\z@}{-1em}{0.4em}{\normalfont\large\bfseries\color{inkred}}}
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}{-0.7em}{0.25em}{\normalfont\normalsize\bfseries\color{inkred}}}
+\makeatother
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.5\baselineskip}
+\setlength{\leftmargini}{1.35em}
+\newenvironment{apuntebox}[1]{\begin{tcolorbox}[colback=palered,colframe=inkred,boxrule=.7pt,arc=0mm,left=.8em,right=.8em,top=.45em,bottom=.45em]\textcolor{inkred}{\textbf{#1}}\quad}{\end{tcolorbox}}
+\newenvironment{azulbox}[1]{\begin{tcolorbox}[colback=paleblue,colframe=cyanink,boxrule=.5pt,arc=0mm]\textcolor{cyanink}{\textbf{#1}}\quad}{\end{tcolorbox}}
+\newcommand{\rojo}[1]{\textcolor{inkred}{#1}}
+\newcommand{\azul}[1]{\textcolor{inkblue}{#1}}
+\newcommand{\naranja}[1]{\textcolor{orangeink}{#1}}
+\newcommand{\gris}[1]{\textcolor{pencilgray}{#1}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\newcommand{\Th}{\Theta}
+\newcommand{\fuente}[1]{\par\textcolor{pencilgray}{\footnotesize #1}\par}
+\newcommand{\matriz}[3]{\begin{center}\renewcommand{\arraystretch}{1.25}\begin{tabular}{c|#1}#2\\\hline #3\end{tabular}\end{center}}
+\tikzset{dot/.style={circle,fill=black,inner sep=1.6pt},every picture/.style={line width=.7pt},pay/.style={font=\small},lab/.style={font=\small,fill=white,inner sep=1.5pt}}
+\newcommand{\arbolprisionero}{\begin{center}\begin{tikzpicture}[x=1cm,y=1cm]
+\node[dot,label=above:{$(A)$}] (a) at (0,0){};
+\node[dot,label=above left:{$(B)$}] (b) at (-2,-1.2){};
+\node[dot,label=above right:{$(B)$}] (c) at (2,-1.2){};
+\draw (a)--node[lab,above left]{$C$}(b) (a)--node[lab,above right]{$-C$}(c);
+\draw[dashed] (b)--(c);
+\foreach \name/\xx/\parent/\act/\pp in {d/-3/b/C/{(1,1)},e/-1/b/-C/{(5,0)},f/1/c/C/{(0,5)},g/3/c/-C/{(4,4)}}{\node[dot,label={[pay]below:{$\pp$}}] (\name) at (\xx,-2.5){};\draw (\parent)--node[lab,above]{$\act$}(\name);}
+\end{tikzpicture}\end{center}}
+\newcommand{\arbolentrada}{\begin{center}\begin{tikzpicture}
+\node[dot,label=above:{$(E)$}] (e) at (0,0){};
+\node[dot,label=left:{$(I)$}] (i) at (0,-1.5){};
+\node[dot,label=right:{$(0,6)$}] (n) at (2.5,0){};
+\draw (e)--node[lab,above]{$-E$}(n) (e)--node[lab,left]{$E$}(i);
+\node[dot,label=below:{$(-1,1)$}] (l) at (-1.5,-2.7){};
+\node[dot,label=below:{$(2,2)$}] (r) at (1.5,-2.7){};
+\draw (i)--node[lab,above left]{$G$}(l) (i)--node[lab,above right]{$-G$}(r);
+\end{tikzpicture}\end{center}}
+\newcommand{\arbolAB}[1]{\begin{center}\begin{tikzpicture}
+\ifnum#1=1\fill[paleblue](-3.15,-2.55)rectangle(-.55,-.8);\fill[orangeink!22](.55,-2.55)rectangle(3.15,-.8);\fi
+\node[dot,label=above:{$(1)$}] (a) at (0,0){};
+\node[dot,label=above left:{$(2)$}] (b) at (-1.8,-1.1){};
+\node[dot,label=above right:{$(2)$}] (c) at (1.8,-1.1){};
+\draw (a)--node[lab,above left]{$A$}(b) (a)--node[lab,above right]{$B$}(c);
+\foreach \name/\xx/\parent/\act in {d/-2.7/b/C,e/-.9/b/D,f/.9/c/E,g/2.7/c/F}{\node[dot] (\name) at (\xx,-2.2){};\draw (\parent)--node[lab,above]{$\act$}(\name);}
+\ifnum#1=1 \node[below] at (d){$q$};\node[below] at(e){$1-q$};\node[below] at(f){$h$};\node[below] at(g){$1-h$};\fi
+\end{tikzpicture}\end{center}}
+\newcommand{\payplot}[1]{\begin{tikzpicture}[scale=1.25]
+\ifnum#1=2\draw[->](0,0)--(3.6,0)node[right]{$u_1(s_1,E)$};\draw[->](0,0)--(0,3.7)node[above]{$u_1(s_1,D)$};\else\draw[->](0,0)--(3.6,0)node[right]{$u_1(s_1,D)$};\draw[->](0,0)--(0,3.7)node[above]{$u_1(s_1,E)$};\fi
+\ifnum#1=1\draw[pattern=north east lines,pattern color=pencilgray,draw=none](1,1)rectangle(3,3);\fi\draw[inkred,thick] (0,3)--(3,0);\node[left] at(0,3){$(0,3)$};\node[below] at(3,0){$(3,0)$};
+\ifnum#1=2\fill(1,1)circle(1.3pt);\else\draw[pattern=north east lines,pattern color=inkred,draw=none](.95,1.95)--(1.05,2.05)--(2.05,1.05)--(1.95,.95)--cycle;\fi\fill[purpleink] (#1,#1) circle(1.6pt);\node[above right,purpleink] at(#1,#1){$C$};
+\draw[pattern=north east lines,pattern color=pencilgray] (0,3) rectangle(3,3.6);\draw[pattern=north east lines,pattern color=pencilgray] (3,0) rectangle(3.5,3);
+\foreach \v in {1,2}{\draw(\v,0)--(\v,-.06)node[below]{$\v$};\draw(0,\v)--(-.06,\v)node[left]{$\v$};}
+\end{tikzpicture}}
+\newcommand{\simpleBR}[1]{\begin{tikzpicture}[scale=1.4]
+\draw[->](0,0)--(2.25,0)node[right]{$q$};\draw[->](0,0)--(0,2.3)node[above]{$p$};
+\draw[dotted,pencilgray](0,2)--(2,2)--(2,0);\node[left] at(0,2){$1$};\node[below]at(2,0){$1$};
+\ifcase#1\draw[inkred,thick](0,2)--(2,2);\or\draw[inkred,thick](0,0)--(1,0)--(1,2)--(2,2);\node[below,inkred]at(1,0){$\bar q$};\or\draw[inkred,thick](0,2)--(1,2)--(1,0)--(2,0);\node[below,inkred]at(1,0){$\bar q$};\or\draw[inkred,thick](0,0)--(2,0);\fi
+\end{tikzpicture}}
+\newcommand{\casoBR}[2]{\begin{tikzpicture}[scale=1.17]
+\draw[gray!60,thin](0,0)rectangle(2,2);
+\ifcase#1\draw[inkred,thick](0,0)--(2,0);\or\draw[inkred,thick](0,2)--(1,2)--(1,0)--(2,0);\or\draw[inkred,thick](0,0)--(1,0)--(1,2)--(2,2);\or\draw[inkred,thick](0,2)--(2,2);\fi
+\ifcase#2\draw[inkblue,thick](2,0)--(2,2);\or\draw[inkblue,thick](0,0)--(0,1)--(2,1)--(2,2);\or\draw[inkblue,thick](2,0)--(2,1)--(0,1)--(0,2);\or\draw[inkblue,thick](0,0)--(0,2);\fi
+\ifcase#1
+\ifcase#2\fill(2,0)circle(1.5pt);\or\fill(0,0)circle(1.5pt);\or\fill(2,0)circle(1.5pt);\or\fill(0,0)circle(1.5pt);\fi
+\or
+\ifcase#2\fill(2,0)circle(1.5pt);\or\foreach\x/\y in {0/2,1/1,2/0}{\fill(\x,\y)circle(1.5pt);}\or\fill(1,1)circle(1.5pt);\or\fill(0,2)circle(1.5pt);\fi
+\or
+\ifcase#2\fill(2,2)circle(1.5pt);\or\fill(1,1)circle(1.5pt);\or\foreach\x/\y in {0/0,1/1,2/2}{\fill(\x,\y)circle(1.5pt);}\or\fill(0,0)circle(1.5pt);\fi
+\or
+\ifcase#2\fill(2,2)circle(1.5pt);\or\fill(2,2)circle(1.5pt);\or\fill(0,2)circle(1.5pt);\or\fill(0,2)circle(1.5pt);\fi
+\fi
+\end{tikzpicture}}
+\pagestyle{fancy}\fancyhf{}\fancyhead[L]{Octavio Sivori}\fancyhead[R]{Micro II}\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{.4pt}\renewcommand{\footrulewidth}{0pt}\setlength{\headheight}{14.5pt}
+
+
+\begin{document}
+\shorthandoff{<>}
+\begin{center}{\LARGE\bfseries\color{inkred} Teoría de los Juegos}\\Microeconomía II\end{center}
+\section{Teoría de los juegos}
+
+\subsection{Introducción}
+ Teoría de los Juegos son decisiones interdependientes.
+
+CLASIFICACIÓN:
+\begin{itemize}\item Juegos cooperativos\item Juegos no cooperativos\item (a) Dinámicos vs. estáticos\item (b) Info. completa vs. incompleta\end{itemize}
+\begin{center}\begin{tabular}{l|p{4cm}|p{5cm}}&Info. Completa&Info. Incompleta\\\hline Estáticos&(simultáneo) Nash&(Bayesiano) Bayesiano de Nash\\Dinámicos&(secuencial) Subjuego Perfecto&(también) Bayesiano perfecto, Secuencial\end{tabular}\end{center}
+\rojo{Estáticos:} los jugadores no observan lo que jugó el resto.
+
+\rojo{Dinámicos:} al menos un jugador observa la jugada de otro antes de jugar.
+
+\rojo{Info. completa:} jugadores conocen la estructura completa y los pagos del juego.
+
+\subsection{Formas de representación}
+
+\rojo{Forma extensiva:} está toda la info. necesaria (y más) necesaria para resolver el juego (árbol).
+
+\rojo{Forma normal:} info. reducida (matriz).
+
+\subsection{Elementos de la forma extensiva}
+
+Básicos\ldots
+\begin{itemize}\item $X=$ conjunto finito de nodos. Son TODOS los puntos del árbol.
+\item $A=$ conjunto de posibles acciones
+\item $\{1,2,\ldots,I\}=$ conjunto finito de jugadores\end{itemize}
+\begin{center}\begin{tikzpicture}[scale=.8]
+\foreach\id/\xx/\yy in {1/0/0,2/-1.4/-1,3/1.4/-1,4/-2.2/-2,5/-.6/-2,6/.6/-2,7/2.2/-2}{\node[dot,label=right:{\color{purpleink}$\id$}](n\id)at(\xx,\yy){};}
+\node[above]at(n1){$A$};\node[above left]at(n2){$B$};\node[above right]at(n3){$B$};
+\draw(n1)--node[above left]{$C$}(n2) (n1)--node[above right]{$-C$}(n3) (n2)--node[left]{$C$}(n4) (n2)--node[right]{$-C$}(n5) (n3)--node[left]{$C$}(n6) (n3)--node[right]{$-C$}(n7);
+\draw[dashed](n2)--(n3);
+\foreach\id/\pay in {4/{(1,1)},5/{(5,0)},6/{(0,5)},7/{(4,4)}}{\node[below]at(n\id){$\pay$};}
+\end{tikzpicture}\end{center}
+Más definiciones\ldots
+\begin{itemize}\item $p:X\to\{X\cup\varnothing\}$ que indica el predecesor inmediato de cada nodo $x\in X$.
+\gris{$p(4)=2$.}
+\item $p(x)\ne\varnothing\ \forall x\in X$ \gris{($x$ NO nodo inicial)}, $x\ne x_0$.
+\item $P(x)=$ todos los predecesores hasta $x$. \gris{$P(4)=\{1,2\}$.}
+\item $s(x):\{x'\in X:p(x')=x\}\to$ sucesores inmediatos de $x$. \gris{``inversa'' de $p(x)$}
+\item $S(x):$ todos los nodos después de $x$\end{itemize}
+Pedimos\ldots\ $S(x)\cap P(x)=\varnothing\quad\forall x$ \gris{(evitamos ciclos)}
+\begin{itemize}\item $T=\{x\in X:s(x)=\varnothing\}\to$ nodos terminales
+\item $X-T=$ nodos de decisión
+\item Función de acción: $a:X-\{x_0\}\to A$
+\rojo{$\to$ Nos devuelve la acción $a\in A$ que nos llevó a $x\in X$}. Es una ! acción. \gris{$a(2)=\{C\}$}
+\end{itemize}
+\begin{apuntebox}{Vale siempre}Si $x',x''\in s(x)$ ($x'\ne x''$) $\Rightarrow a(x')\ne a(x'')$\end{apuntebox}
+\begin{center}\begin{tikzpicture}\node[dot,label=above:{$1$}](a)at(0,0){};\node[dot,label=below:{$2$}](b)at(-1,-.8){};\node[dot,label=below:{$3$}](c)at(1,-.8){};\draw(a)--node[above left]{$C$}(b) (a)--node[above right]{$-C$}(c);\end{tikzpicture}\end{center}\gris{$x'=2$, $x''=3\in s(1)$; $a(2)=C$, $a(3)=-C$.}
+
+\rojo{$c(x)$} $=$ conjunto de acciones disponibles en el nodo $x$
+\[c(x)=\{a\in A:\exists x'\in s(x)\wedge a(x')=a\}.\]
+\gris{$c(1)=\{C,-C\}$.}
+
+$a\ X-T$ lo vamos a particionar $\to$ Su $\bigcup_{i=1}^m=X-T\wedge\bigcap_{i=1}^m=\varnothing$.
+
+$\widetilde H=$ conjunto de particiones de $X\ \to$ conjuntos de información (TODOS)
+\gris{$\to\widetilde H=\{\{1\},\{2,3\}\}$.}
+
+Función: $H:X-T\to\widetilde H$ asigna un nodo de decisión $x$ a un conjunto de información $H(x)\in\widetilde H$ \gris{(que le corresponde).}
+\gris{$H(2)=\{2,3\}=H(3)$; $\widetilde H=\{\underbrace{\{1\},\{2,3\}}_{H}\}$.}
+\begin{center}\begin{tikzpicture}\node[dot,label=above:{$1$}](a)at(0,0){};\node[dot,label=below:{$2$}](b)at(-1,-1){};\node[dot,label=below:{$3$}](c)at(1,-1){};\draw(a)--(b)(a)--(c);\draw[dashed](b)--(c);\draw[inkblue](0,0)ellipse(.35 and .22);\draw[inkblue](0,-1)ellipse(1.5 and .35);\node[right,inkblue]at(1.7,-.5){2 conjuntos de información};\end{tikzpicture}\end{center}
+\begin{apuntebox}{NOTA}Si dos nodos $\in$ mismo conjunto informativo $(H(x)=H(x'))$ $\Rightarrow$ El jugador no sabe en qué nodo está $(c(x)=c(x'))$ $\Rightarrow$ No puede inferir info. adicional sobre donde está.
+\gris{Tienen las mismas acciones disponibles}\end{apuntebox}
+$C(H)=$ conjunto de acciones disponibles ($\forall x\in H$)
+\[C(H)=\{a\in A:a\in c(x)\ /\ x\in H\}.\]
+Función $\iota:\widetilde H\to\{N,1,\ldots,I\}$ \gris{(asigna cada conjunto informativo a un jugador)}\quad\rojo{$N\to$ naturaleza}\quad\rojo{$1,\ldots,I\to$ jugadores}.
+\begin{apuntebox}{}$\widetilde H_i=\{H\in\widetilde H:i=\iota(H)\}$ conjuntos de info. donde juega $i$.\end{apuntebox}
+Sobre la Naturaleza $\to$ Lo que ``juega'' es exógeno
+\[\rho:\widetilde H_0\times A\to[0,1]\]
+asigna probabilidades a las acciones de $N$.
+\begin{itemize}\item $\rho(H,a)=0$ si $a\notin C(H)$
+\item $\sum_{a\in C(H)}\rho(H,a)=1\quad\forall H\in\widetilde H_0$\end{itemize}
+Funciones de pago $u=\{u_1(\cdot),u_2(\cdot),\ldots,u_I(\cdot)\}\to u_i:T\to\mathbb R$.
+
+$\to$ Asignan utilidades a los jugadores para cada nodo terminal.
+
+$\therefore$ Definimos el juego en forma extensiva como una colección
+\begin{apuntebox}{}$\Gamma_E=\{X,A,I,p(\cdot),a(\cdot),\widetilde H,H(\cdot),\iota(\cdot),\rho(\cdot),u\}$.\end{apuntebox}
+\subsection{Elementos de la forma normal}
+\begin{center}\begin{tikzpicture}[scale=.7]\draw(0,0)rectangle(1.8,1);\draw(.9,0)--(.9,1);\draw(0,.5)--(1.8,.5);\node[above]at(.9,1){$(1)$};\node[left]at(0,.5){$(2)$};\end{tikzpicture}\end{center}
+Estrategia del jugador $i$: \rojo{plan contingente completo para accionar}
+\gris{$\to$ Qué acción tomará para cada conjunto informativo.}
+\[s_i:\widetilde H_i\to A\ /\ s_i(H)\in C(H)\quad\forall H\in\widetilde H_i.\]
+\gris{Estr. se define por conjunto informativo, no por nodo de decisión.}
+
+Cada $s_i$ induce un resultado del juego (porque determina una distribución probabilística sobre $T$).
+\gris{Si $\nexists$ azar: el perfil $(s_i,s_{-i})$ determina un único $T$.}
+
+\gris{Si $\exists$ azar: el perfil $(s_i,s_{-i})$ determina una distribución de probabilidad sobre $T$. $\to$ Kreps: la naturaleza determina con $p=0,9\to T=A$ y $p=0,1\to T=B$.}
+
+\begin{apuntebox}{Definición.}
+La representación de juegos en forma normal especifica tres elementos:
+\begin{enumerate}\item Conjunto de jugadores $\mathcal I=\{1,\ldots,I\}$
+\item Para cada $i$, un espacio de estrategias puras $S_i=\{s_{1i},\ldots,s_{K_i i}\}$ \gris{(todas las estrategias $s_i(\cdot)$ posibles)}.
+\gris{Todas las combinaciones de acciones por conjunto informativo posibles: $s_i=(\underbrace{\_}_{a,b},\underbrace{\_}_{c,d})$; $S_i=\{(a,c),(a,d),(b,c),\ldots\}$.}
+\item Para cada $i$ una función de utilidad (o de pagos)
+\[u_i:S_1\times S_2\times\cdots\times S_I\to\mathbb R,\quad(s_1,\ldots,s_I)\mapsto u_i(s_1,\ldots,s_I).\]
+\gris{$u_i(s_i,s_{-i})=$ utilidad esperada de jugar $s_i$, dado que los otros están jugando $s_{-i}$.}\end{enumerate}
+\end{apuntebox}
+
+TECNICALIDADES:
+\begin{itemize}\item $s=(s_1,\ldots,s_I)=(s_i,s_{-i})$ es un perfil de estrategias
+\item $u_i:$ func. de utilidad Bernoulli \gris{(lineal en $p$, acordamos VNM)}
+\item Jugadores quieren maximizar el valor esperado de $u_i(\cdot)$\end{itemize}
+$\therefore$ Juego normal es una terna
+\begin{apuntebox}{}$\Gamma_N=\{\mathcal I,(S_i)_{i=1}^I,(u_i)_{i=1}^I\}$.\end{apuntebox}
+\gris{Con pocos jugadores y estrategias, vemos la interacción con una matriz. Dilema del prisionero:}
+\matriz{cc}{&$C$&$-C$}{$C$&$(1,1)$&$(5,0)$\\$-C$&$(0,5)$&$(4,4)$}
+\subsection{Relación entre la forma extensiva y la forma normal}
+\begin{itemize}\item $\Gamma_N\subseteq\Gamma_E\to$ es un ``resumen'' de $\Gamma_E$, sólo capta $\mathcal I$, $(s_i,s_{-i})$, $u_i$, $\forall i$.
+\item $\exists!$ representación de $\Gamma_N$ de una forma $\Gamma_E$ \gris{(pq sólo hay 1 dinámica posible)}
+\item $\ne\Gamma_E$ se mapean en la misma $\Gamma_N$ \gris{[$\Gamma_N$ guarda solo $(s_i)^I,u_i^I$; pierde el orden]}
+\item Mirando $\Gamma_N$ a veces no podemos distinguir entre una $\Gamma_E$ estática y otra dinámica. Con $\Gamma_N$ no conoces el juego ``original''.\end{itemize}
+\subsection{Estrategias mixtas}
+
+Jugador randomiza sobre el espacio de estrategias puras
+
+\begin{apuntebox}{Definición. Estrategia pura}
+Especifica una elección $s_i(H)$ para cada $H\in\widetilde H_i$.
+\end{apuntebox}
+
+\begin{apuntebox}{Definición. Estrategia mixta}
+Función
+\[\sigma_i:S_i\to[0,1]\]
+que le asigna una \rojo{probabilidad} a cada estrategia pura $s_i$: una probabilidad $\sigma_i(s_i)$ ($\sum_{s_i\in S_i}\sigma_i(s_i)=1$).
+\end{apuntebox}
+
+$\to$ Permiten convexificar el espacio de estrategias.
+\gris{Sup $S_i=\{A,B\}$, $\sigma^1=(1,0)$, $\sigma^2=(0,1)$; $\sigma=\alpha\sigma^1+(1-\alpha)\sigma^2\in\Delta(S_i)$.}
+
+NOTACIÓN: $\Delta(S_i)=$ espacio de estrategias mixtas \gris{(puras $\subseteq\Delta(S_i)$)}
+
+Utilidad de un perfil de estrategias mixtas $\sigma$:
+\[U_i(\sigma_1,\sigma_2,\ldots,\sigma_I)=\sum_{s\in S}[\sigma_1(s_1)\sigma_2(s_2)\cdots\sigma_I(s_I)]u_i(s_1,\ldots,s_I).\]
+\gris{Utilidad de lotería. Perfil; prob. que cada uno juegue su estrategia $s_i\ \forall i$; lo que yo voy a jugar, dado lo que juega el resto.}
+
+\gris{Asoc.: Micro I VNA. $\mathcal L=\{\ell_1,\ldots,\ell_k\}\in S$; $u_i(\ell_j)=$ util. de una alternativa en la consecuencia $j$; $\sigma_i(\ell_j)=$ prob. de caer en la consecuencia $j$.}
+
+Ver ej. en slides.
+
+Sup: $\nexists$ señales comunes $\Rightarrow\sigma_i(s_i)\perp\sigma_j(s_j)\quad\forall i\ne j$. Es decir, las pr. de jugar cada estrategia son $\perp$.
+
+\subsection{Estrategias de conducta}
+
+Jugador randomiza sobre las acciones disponibles en cada conjunto de información.
+
+\begin{apuntebox}{Definición. Estrategia de conducta}
+Para cada conjunto de info. $H\in\widetilde H_i\wedge$ para cada acción $a\in C(H)$, el jugador $i$ especifica una \rojo{probabilidad} $\lambda_i(a\mid H)$ (con $\sum_{a\in C(H)}\lambda_i(a\mid H)=1\quad\forall H\in\widetilde H_i$).
+\end{apuntebox}
+
+\subsection{Comparación entre estrategias mixtas y de conducta}
+
+\gris{Ejemplo:} mixtas
+\arbolAB{0}
+Jugador tiene 4 estrategias en puras $\{(C,E);(C,F);(D,E);(D,F)\}$.
+
+\rojo{$p_1$, $p_2$, $p_3$, $1-p_1-p_2-p_3$ asignamos prob. a cada estrategia.}
+
+\gris{Ejemplo:} de conducta
+\arbolAB{1}
+Especificamos la prob. del (2) de elegir una acción en cada conjunto de info.
+\[\Pr(jugar\ C)=q,\quad\Pr(jugar\ D)=1-q,\quad\Pr(jugar\ E)=h,\quad\Pr(jugar\ F)=1-h.\]
+\rojo{Relación entre ambas\ldots}
+\begin{itemize}\item En ambos casos, se especifica todo lo que cada jugador debe hacer
+\item Dada una \rojo{estrategia mixta}, $\exists!$ \rojo{estrategia de conducta} asociada \gris{(no vale la inversa) (3 p en mixtas, 2 p en conducta)}
+\item En el ejemplo:
+\[\begin{cases}q=p_1+p_2\\h=p_1+p_3\end{cases}\]
+\item Como lo ! relevante es la distribución sobre los nodos terminales (y ambos enfoques llevan a la misma dist.) es lo mismo cuál de los dos usemos por el \rojo{Teorema de Kuhn} (juego finito e info. perf.).\end{itemize}
+\subsection{Juegos estáticos con información completa}
+
+Contexto:
+\begin{itemize}\item Con $\Gamma_N$ nos alcanza
+\item Sup. dominio público / conocimiento común de toda la info. del juego
+\item Cada jugador toma decisiones considerando su propio bienestar y $\exists$ una externalidad de cada jugador sobre el resultado del resto\end{itemize}
+\rojo{¿Qué esperamos que elijan los jugadores?}
+
+En estos juegos, el jugador $i$ toma la acción de los otros como dada. Se ``imagina'' lo que están haciendo los otros.
+
+Pero no tiene NINGÚN tipo de influencia sobre los otros lo que él haga, y viceversa.
+
+Ejemplo: \rojo{Dilema del prisionero}.
+\matriz{cc}{&$C$&$-C$}{$C$&$(1,1)$&$(5,0)$\\$-C$&$(0,5)$&$(4,4)$}
+(1) imagina 2 situaciones:
+\begin{itemize}\item (2) Confiesa:
+\[\left.\begin{aligned}u_1(C\mid C)&=1\\u_1(-C\mid C)&=0\end{aligned}\right\}\Rightarrow(1)\text{ elige }C.\]
+\item (2) No confiesa:
+\[\left.\begin{aligned}u_1(C\mid-C)&=5\\u_1(-C\mid-C)&=4\end{aligned}\right\}\Rightarrow(1)\text{ elige }C.\]\end{itemize}
+$\to$ INDEPENDIENTEMENTE de lo que haga el otro, \rojo{(1) SIEMPRE confiesa}.
+
+$\to$ Esperamos que los dos confiesen.
+
+$\to$ Notemos que esta situación \rojo{NO es Pareto óptima}. Si ninguno confesara, estarían mejor\ldots
+
+$>$ Pero no hay incentivos para eso.
+
+Generalizando\ldots
+
+Podemos derivar el \rojo{primer concepto de solución} el cual se denomina \rojo{equilibrio en estrategias estrictamente dominantes}.
+
+\subsection{Estrategias estrictamente dominantes}
+\begin{apuntebox}{Definición.}
+$\sigma_i\in\Sigma_i=\Delta(S_i)$ en $\Gamma_N$ tal que
+$u_i(\sigma_i,\sigma_{-i})>u_i(\sigma'_i,\sigma_{-i})\quad\forall\sigma_{-i}\ \forall\sigma'_i\ne\sigma_i$.
+\end{apuntebox}
+\gris{``Le conviene jugar $\sigma_i$ $\forall$ posibles estrategias de sus rivales''. Es decir, maximiza su pago para cualquier cosa que puedan jugar sus rivales.}
+
+$\Rightarrow$ Le gana a TODAS las estrategias SIEMPRE, sin importar lo que hagan los demás.
+
+NOTAS:
+\begin{itemize}\item Solo puede $\exists!$ estr. dominante
+\item Siempre que $\exists$ estr. dom., el jugador la juega.
+\item Siempre que $\exists$, es en puras (para juegos finitos)\end{itemize}
+\begin{center}\begin{tikzpicture}[scale=1.3]\draw(0,0)--(2,0)--(1,1.7)--cycle;\draw(.35,.6)--(1.65,.6)(.65,1.1)--(1.35,1.1);\node[below]at(0,0){$a_2$};\node[below]at(2,0){$a_1$};\node[above]at(1,1.7){$a_3$};\node[right,gray]at(2.3,.8){$\Delta(S_i)$};\end{tikzpicture}\end{center}
+\gris{Combinaciones convexas. Dan la misma utilidad. Las mixtas NO pueden dominar a las mismas estrategias puras que la componen.}
+
+\subsection{Estrategias estrictamente dominadas}
+\begin{apuntebox}{Definición.}
+$\sigma_i\in\Delta(S_i)$ está estrictamente dominada para el jugador $i$ si:
+$\exists\sigma'_i\in\Delta(S_i)\ /\ u_i(\sigma'_i,s_{-i})>u_i(\sigma_i,s_{-i})\quad\forall s_{-i}\in S_{-i}$.
+\end{apuntebox}
+NOTAR: Solo verificamos que $\sigma'_i$ genere pagos más altos cuando los rivales juegan estr. puras, porque
+\[u_i(\sigma'_i,s_{-i})>u_i(\sigma_i,s_{-i})\ \forall s_{-i}\quad\Leftrightarrow\quad u_i(\sigma'_i,\sigma_{-i})>u_i(\sigma_i,\sigma_{-i})\ \forall\sigma_{-i}.\]
+\gris{Idea: $\Rightarrow$ Pagos ``contra mixtas'' son combinación convexa de los pagos ``contra puras''. $\Leftarrow$ puras $\subseteq$ mixtas.}
+
+\begin{apuntebox}{}Si una estrategia pura $s_i$ está dominada $\Rightarrow$ Cualquier estrategia mixta $\sigma_i$ que pondere positivamente a esta estrategia $(\sigma_i(s_i)>0)$ estará dominada también.
+\gris{$\Rightarrow$ La pura dominada $\downarrow u(\sigma_i)\wedge\Rightarrow u_i(dominante,s_{-i})>u_i(\sigma_i,s_{-i})$.}\end{apuntebox}
+NOTAS:
+\begin{itemize}\item Pueden haber puras dominadas por mixtas pero no dominadas por puras (1)
+\item Pueden haber mixtas dominadas aunque ninguna de sus puras que la componen estén dominadas (2)\end{itemize}
+\rojo{(1)} Ejemplo:
+\matriz{cc}{&$D$&$E$}{$A$&$3$&$0$\\$B$&$0$&$3$\\$C$&$1$&$1$}
+Ni $A$ ni $B$ dominan a $C$, pero hay mixtas entre $A$ y $B$ que dominan a $C$.
+\begin{center}\payplot{1}\end{center}
+\gris{Rayado negro $\equiv$ espacio de dominación.}
+
+\rojo{Rayado rojo $\equiv$ espacio donde la mixta entre $A$ y $B$ domina a la pura $C$.}
+
+\rojo{(2)} Ejemplo:\matriz{cc}{&$D$&$E$}{$A$&$3$&$0$\\$B$&$0$&$3$\\$C$&$2$&$2$}
+$\nexists$ puras dominadas, pero las mixtas entre $A$ y $B$ están dominadas por mixtas entre $A$ y $C$, ó $B$ y $C$.
+\begin{center}\payplot{2}\end{center}
+\rojo{$C$ no está dominada ni por $A$ ni $B$, ni por una mixta de $A$ y $B$.}
+
+Sup $\rojo{\sigma_1=(1/2;1/2)}$, $u_1(\sigma_1)=(1,5;1,5)\ \rojo{\Rightarrow\sigma_1\text{ está dominada por }C}.$
+\begin{center}\begin{tikzpicture}[scale=1.3]
+\draw[->](0,0)--(3.6,0)node[right]{$u_1(s_1,D)$};\draw[->](0,0)--(0,3.6)node[above]{$u_1(s_1,E)$};
+\draw[pattern=north east lines,pattern color=pencilgray](0,3)rectangle(3,3.5);\draw[pattern=north east lines,pattern color=pencilgray](3,0)rectangle(3.5,1.5);\fill(1,1)circle(1.3pt);\draw[inkred,thick](0,3)--(3,0);\draw[inkblue,dashed](0,1.5)--(3.3,1.5)(1.5,0)--(1.5,3.3);\draw[pattern=north east lines,pattern color=inkblue](1.5,1.5)rectangle(3.3,3.3);\fill[purpleink](2,2)circle(2pt);\node[right,purpleink]at(2,2){$C$};\node[below,inkblue]at(1.5,0){$1.5$};\node[left,inkblue]at(0,1.5){$1.5$};\node[left]at(0,3){$(0,3)$};\node[below]at(3,0){$(3,0)$};
+\end{tikzpicture}\end{center}\begin{center}\begin{tikzpicture}[scale=1.3]
+\draw[->](0,0)--(3.6,0);\draw[->](0,0)--(0,3.6);\fill[inkred!15](0,3)--(2,2)--(3,0)--cycle;\draw[pattern=north east lines,pattern color=inkred](0,3)--(2,2)--(3,0)--cycle;\draw[inkred,very thick](0,3)--(2,2)--(3,0);\draw[inkred](0,3)--(3,0);\foreach\p/\lab in {(0,3)/A,(2,2)/C,(3,0)/B}{\fill\p circle(2pt);\node[above right]at\p{$\lab$};}\node[inkred,below,text width=4cm,align=center]at(1.5,-.3){$\overline{AC}$ y $\overline{CB}$ son los únicos no dominados.};
+\end{tikzpicture}\end{center}
+\begin{apuntebox}{Definición. Racionalidad}
+Un jugador es racional en caso de que no juegue estrategias estrictamente dominadas.
+\end{apuntebox}
+
+\[\text{racionalidad}\ \underset{\text{solo si }\#S_i=2}{\overset{\text{always}}{\rightleftarrows}}\ \text{si }\exists\text{ dominante la juega}.\]
+\gris{Rec.: No juega dominada. Si $\exists$ estr. dominante, domina a todas las demás. Tiene que elegir entre las no estrictamente dominadas $\to$ ! dominante.}
+
+\subsection{Eliminación sucesiva de estrategias estrictamente dominadas}
+
+Sup. conocimiento común de la racionalidad.
+
+Idea: llegar a un equilibrio en estrategias dominantes.
+
+Procedimiento: \gris{(robusto al orden) (Si se obtiene una solución $\Rightarrow$ El juego se resuelve por PESEED)}
+\begin{enumerate}\item Eliminar estr. dominadas por puras
+\item Eliminar estr. dominadas por mixtas
+\item Eliminar estr. mixtas que asignan $\Pr>0$ a una estr. pura dominada
+\item Eliminar estr. mixtas dominadas \gris{(aunque NO tengan $s_i$ dominadas)}
+\item Repetir hasta que no se pueda eliminar más nada\end{enumerate}
+
+\subsection{Estrategias débilmente dominadas}
+\begin{apuntebox}{Definición.}
+Estrategia $\sigma_i\in\Delta(S_i)$ está débilmente dominada para $i$ si $\exists$ otra estrategia $\sigma'_i\in\Delta(S_i)$ tal que
+\begin{align*}u_i(\sigma'_i,s_{-i})&\ge u_i(\sigma_i,s_{-i})&&\forall s_{-i}\in S_{-i}\ \wedge\\u_i(\sigma'_i,s_{-i})&>u_i(\sigma_i,s_{-i})&&\text{para algún }s_{-i}\in S_{-i}.\end{align*}
+\end{apuntebox}
+NOTAR:
+\begin{itemize}\item Racionalidad $\not\Rightarrow$ jugador no juegue estr. débilmente dominadas
+\item Estrictamente dominada $\Rightarrow$ Débilmente dominada
+\item Los sobrevivientes de la eliminación de estrategias débilmente dominadas NO son robustos al orden de la eliminación\end{itemize}
+\subsection{Mejores respuestas y racionalizabilidad}
+\gris{El jugador optimiza sobre una conjetura que tenga del rival, $\forall\sigma_{-i}$.}
+
+\begin{apuntebox}{Definición.}
+La mejor respuesta del jugador $i$ a la estrategia de los rivales $\sigma_{-i}$ es $\sigma_i$ tal que
+$u_i(\sigma_i,\sigma_{-i})\ge u_i(\sigma'_i,\sigma_{-i})\quad\forall\sigma'_i$.
+\end{apuntebox}
+El \rojo{conjunto de mejores respuestas} a la estrategia $\sigma_{-i}$ es
+\[BR_i(\sigma_{-i})=\{\sigma_i:u_i(\sigma_i,\sigma_{-i})\ge u_i(\sigma'_i,\sigma_{-i})\ \forall\sigma'_i\}.\]
+Dada una estrategia de los otros, $\sigma_i$ es óptima. No hay nada mejor.
+
+NOTAS:
+\begin{itemize}\item $\sigma_i$ estrictamente dominante $\Rightarrow$ Es siempre $BR_i$ ($\sigma_i=BR_i(\sigma_{-i})\ \forall\sigma_{-i}$)
+\item $\sigma_i$ estrictamente dominada $\Rightarrow$ Nunca es $BR_i$\end{itemize}
+\begin{center}\begin{tikzpicture}\draw(0,0)rectangle(4.6,2.6);\node[above left]at(0,2.6){$S_i$};\draw[inkred](2.3,1.4)circle(1.1);\draw[orangeink](2.3,1.4)circle(.75);\node[font=\scriptsize,orangeink]at(2.3,1.4){Dominadas};\node[font=\scriptsize,inkred,fill=white,inner sep=1pt]at(3.2,.55){Nunca BR};\end{tikzpicture}\end{center}
+\gris{Ambos son iguales con menos de dos jugadores. $N=2$. Idea: cuando $N>2$ hay algunas dist. de prob. que no podemos conseguir (espacio de estr. es menor).}
+
+\subsection{Racionalidad bayesiana y estrategias racionalizables}
+\begin{apuntebox}{Definición. Racionalidad bayesiana}
+El jugador $i$ es bayesianamente racional si no juega $\sigma_i$ que nunca son $BR_i$ ($+$ exigente).
+\end{apuntebox}
+
+
+NOTAR:
+\begin{itemize}\item Racionalidad bayesiana $\Rightarrow$ Racionalidad; $\not\Leftarrow$
+\item Asumiendo conocimiento común de la racionalidad bayesiana, podemos hacer eliminación sucesiva de estrategias que nunca son $BR_i$ $\Rightarrow$ Los sobrevivientes forman el conjunto de las \rojo{estrategias racionalizables}.
+\item Robusto al orden de eliminación\end{itemize}
+\begin{apuntebox}{}Estrategias racionalizables $\subseteq$ estrategias que sobreviven PESEED \gris{$\{\text{son iguales si }N=2\}$}.\end{apuntebox}
+Rac. Bayesiana descarta muchas más estrategias, por eso $+$ exigente.
+\begin{center}\begin{tikzpicture}\draw[orangeink](0,0)rectangle(4,2);\fill[paleblue](2,1)ellipse(1.05 and .95);\draw[inkblue](2,1)ellipse(1.05 and .95);\node[inkblue,align=center,font=\small]at(2,1){Estrategias\\dominadas};\node[orangeink,above]at(2,2){Nunca son BR};\foreach\x in {.2,.6,1,3,3.4,3.8}{\draw[orangeink!50,line width=2pt](\x,.1)--(\x+.35,1.9);}\end{tikzpicture}\end{center}\rojo{no se juegan (según nuestra racionalidad Bayesiana).}
+
+Ejemplo de estrategia racionalizable.\matriz{ccc}{&$b_1$&$b_2$&$b_3$}{$a_1$&$(0,7)$&$(2,5)$&$(7,0)$\\$a_2$&$(5,2)$&$(3,3)$&$(3,2)$\\$a_3$&$(7,0)$&$(2,5)$&$(0,7)$}
+Para que las estrategias sean racionalizables, se debe poder formar una cadena de justificaciones sobre por qué se eligió cada acción.
+
+Entonces, para (1)\ldots
+\begin{center}\begin{tikzpicture}\node(a)at(0,0){$a_3$};\node(b)at(1.7,0){$b_1$};\node(c)at(3.4,0){$a_1$};\node(d)at(5.1,0){$b_3$};\draw[<-](a)--(b);\draw[<-](b)--(c);\draw[<-](c)--(d);\draw[->](d.south)to[bend left=25](a.south);\end{tikzpicture}\end{center}\begin{center}\begin{tikzpicture}\node(a)at(0,0){$a_2$};\node(b)at(1.7,0){$b_2$};\draw[<-](a)--(b);\draw[->](b.south)to[bend left=35](a.south);\end{tikzpicture}\end{center}
+$\Rightarrow(a_2,b_2)$ representa situaciones donde nadie se arrepiente ex-post.
+
+Estrategias son racionalizables si podemos armar un \rojo{loop} de $BR$ o de estrategias justificadas.
+
+$\to$ Un \rojo{equilibrio de Nash} se da cuando el loop es entre las mismas estrategias (una para cada jugador).
+
+Estr. racionalizables $\ne\varnothing$.
+
+El \rojo{equilibrio de Nash} es una caracterización de la \rojo{racionalidad Bayesiana}!
+
+\section{Equilibrio de Nash}
+\subsection{Definición y propiedades}
+
+
+
+\begin{apuntebox}{Definición. Equilibrio de Nash}
+Un perfil de estrategias $\sigma_i^*$ es un \rojo{equilibrio de Nash} si
+\[\sigma_i^*\in BR_i(\sigma_{-i}^*)\quad\forall i.\]
+Es decir, para cada $i$ debe cumplirse que
+\[u_i(\sigma_i^*,\sigma_{-i}^*)\ge u_i(\sigma'_i,\sigma_{-i}^*)\quad\forall\sigma'_i\ \forall i.\]
+\end{apuntebox}
+NOTAS:
+\begin{itemize}\item Cada jugador está en su $BR\ \rojo{\to}$ TODOS responden óptimamente
+\item Asume conocimiento común de la racionalidad bayesiana
+\item $NE\subseteq$ racionalizables $\subseteq$ sobrev. de PESEED \gris{[EN es el $+$ exigente.]}
+\item ``Profecías autocumplidas''
+\item Basta verificar que ninguna estrategia \rojo{PURA es un DESVÍO} conveniente\end{itemize}
+\begin{center}\begin{tikzpicture}\draw(0,0)rectangle(4.3,1.8);\draw(1.3,.9)ellipse(.8 and .7);\draw(1.3,.9)ellipse(.4 and .4);\node at(1.3,.9){EN};\node[font=\scriptsize,fill=white,inner sep=1pt]at(1.75,.36){Rac.};\node[font=\small]at(3.25,.9){PESEED};\end{tikzpicture}\end{center}
+\begin{apuntebox}{Teorema}Todo Nash sobrevive PESEED\end{apuntebox}
+Pero\ldots\ NO TODO EN sobrevive PESEDD.
+
+Se parte de la misma base que racionalizabilidad. Cada jugador forma una conjetura sobre cómo van a jugar los rivales. Sólo que ahora la conjetura sí o sí es correcta.
+
+Entonces:
+\[\left.\begin{aligned}&\text{Todo jugador responde óptimamente}\\&\text{a una conjetura}\\&\text{Las conjeturas son correctas}\end{aligned}\right\}\ \begin{gathered}\text{Todo jugador responde óptimamente}\\\text{al comportamiento de sus rivales}\end{gathered}\]
+\gris{D/ (PESEED): $\sigma^*$ es NASH, entonces
+\[u_i(\sigma_i^*,\sigma_{-i}^*)\ge u_i(\sigma_i,\sigma_{-i}^*)\quad\forall\sigma_i\ \forall i.\]
+Si se eliminó, entonces algún $i$ fue el primero en eliminarla
+\[\Rightarrow\sigma_i^*\text{ está estrictamente dominada}\]
+\[\Rightarrow\exists\sigma'_i\text{ tq }u_i(\sigma'_i,\sigma_{-i})>u_i(\sigma_i^*,\sigma_{-i})\quad\forall\sigma_{-i}\text{ no elim.}\]
+ABS! $\square$}
+
+\subsection{Equilibrio de Nash en estrategias mixtas}
+
+Todo jugador debe estar indiferente entre las estrategias puras a las que se les asigna probabilidad positiva.
+
+$\to$ C.c., podría reasignar probabilidades entre las puras y ganar utilidad esperada. (asignando una mayor probabilidad a la que me da más $u_i$) $\to$ De esta manera, para el EN en mixtas podemos igualar la utilidad en puras.
+
+\begin{apuntebox}{Definición alternativa. Equilibrio de Nash en mixtas}
+
+Sea $S_i^+\subseteq S_i$ el conjunto de estrategias que $i$ juega con probabilidad positiva en $\sigma=(\sigma_1,\ldots,\sigma_I)\to$ \rojo{$S_i^+$ es el soporte de la mixta}.
+
+$\Rightarrow$ Decimos que \rojo{$\sigma$ es un EN} $\Leftrightarrow$
+\begin{enumerate}\item $u_i(s_i,\sigma_{-i})=u_i(s'_i,\sigma_{-i})\quad\forall s_i,s'_i\in S_i^+$ (indif. en el soporte)
+\item $u_i(s_i,\sigma_{-i})\ge u_i(s''_i,\sigma_{-i})\quad\forall s_i\in S_i^+\ \forall s''_i\notin S_i^+$ ($\sigma\in BR(\sigma_{-i})$)\end{enumerate}
+\end{apuntebox}
+Ejemplo (MIXTAS)
+\matriz{cc}{&Izquierda $(q)$&Derecha $(1-q)$}{Arriba $(p)$&$(-1,1)$&$(1,-1)$\\Abajo $(1-p)$&$(1,-1)$&$(-1,1)$}
+\gris{Punto clave: Para YO jugar una mixta, mis estrategias puras en $S_i^+$ deben dar la misma utilidad, dada la pr. del rival. $U_1(A\mid q)=U_1(B\mid q)\Rightarrow q^*$.}
+\begin{align*}U_1(Arriba\mid q)&=-1q+1(1-q)=1-2q,\\U_1(Abajo\mid q)&=1q-1(1-q)=2q-1.\end{align*}
+Lineales en $q$.
+
+NOTEMOS que\ldots\ \rojo{es mejor} jugar \rojo{Arriba si $q$ es chico} y \rojo{Abajo si $q$ es grande}.
+
+Si lo graficamos\ldots
+\begin{center}\begin{tikzpicture}[x=5cm,y=1.4cm]
+\draw[->](0,0)--(1.12,0)node[right]{$q$};\draw[->](0,-1.15)--(0,1.2);\draw[inkred,thick](0,1)--(1,-1)node[right]{$U(\text{Arriba})$};\draw[purpleink,thick](0,-1)--(1,1)node[right]{$U(\text{Abajo})$};\node[left]at(0,1){$1$};\node[left]at(0,-1){$-1$};\draw(.5,.05)--(.5,-.05)node[below]{$\bar q$};
+\end{tikzpicture}\end{center}
+Calculamos la Utilidad Esperada de jugar arriba con pr. $p$.
+\begin{align*}U_1(p\mid q)&=-1pq+1p(1-q)+1(1-p)q+(-1)(1-p)(1-q)\\&=p(1-2q)+(1-p)(2q-1)\end{align*}
+
+$=pU_1(Arriba\mid q)+(1-p)U_1(Abajo\mid q)$.
+
+Veamos el conjunto de $BR$:
+\[U_1(Arriba\mid q)<U_1(Abajo\mid q)\Leftrightarrow1-2q<2q-1\Rightarrow q>1/2.\]
+\[\Rightarrow BR_1(q>1/2)=Abajo\quad(p=0),\]
+\[\Rightarrow BR_1(q<1/2)=Arriba\quad(p=1),\]
+\[\Rightarrow BR_1(q=1/2)=p\in[0,1].\]
+\begin{center}\begin{tikzpicture}[scale=2.8]
+\draw[->](0,0)--(1.15,0)node[right]{$q$};\draw[->](0,0)--(0,1.17)node[above]{$p$};
+\draw[purpleink,very thick](0,0)--(.5,0)--(.5,1)--(1,1);\node[purpleink,right]at(1,1){$BR_1$};
+\draw[inkred,very thick](0,1)--(0,.5)--(1,.5)--(1,0);\node[inkred,right]at(1,.5){$BR_2$};
+\fill[cyanink](.5,.5)circle(2pt);\node[cyanink,above right]at(.5,.5){EN};\node[below]at(.5,0){$1/2$};\node[below]at(1,0){$1$};\node[left]at(0,.5){$1/2$};\node[left]at(0,1){$1$};
+\end{tikzpicture}\end{center}
+\begin{apuntebox}{}$EN=\{(1/2,1/2)\}$.\end{apuntebox}
+\subsection{Juegos de dos jugadores y dos estrategias}
+\begin{itemize}\item Siempre $\exists EN\ \rojo{\to}$ puede haber
+\begin{itemize}\item 1 solo en puras\item 1 solo en mixtas\item 2 en puras y 1 en mixtas\end{itemize}
+\item Si algún jugador tiene una estrat. dominante $\Rightarrow\exists! EN$ y es en puras (12 gráficos externos).
+\item Si ninguno tiene estrat. dominante $\Rightarrow\exists$ un equil. en mixtas \gris{(puede haber 2 en puras o no)} (4 gráficos internos).
+\item Siempre $\exists$ equil. si permitimos empates\end{itemize}
+Derivación:
+\matriz{cc}{&$C\ (q)$&$D\ (1-q)$}{$A\ (p)$&$x$&$y$\\$B\ (1-p)$&$w$&$z$}
+Si \rojo{no hay empates}, puede ser que $x>w\wedge y>z$;
+
+$x>w\wedge y<z$; $x<w\wedge y>z$; $x<w\wedge y<z$.
+
+I) $x>w\quad y>z$
+\begin{center}\simpleBR{0}\end{center}
+II) $x>w\quad y<z$
+\begin{center}\simpleBR{1}\end{center}
+\[\overline q=\frac{z-y}{x-w+z-y}\Leftrightarrow qx+(1-q)y=qw+(1-q)z.\]
+Si $q$ es grande $\Rightarrow p=1$ ($A$).
+
+$q$ es chico $\Rightarrow p=0$ ($B$).
+
+III) $x<w\quad y>z$
+\begin{center}\simpleBR{2}\end{center}
+IV) $x<w\quad y<z$
+\begin{center}\simpleBR{3}\end{center}
+Para el jugador 2 ocurre lo mismo. Hay 16 casos:
+\begin{center}\begin{tabular}{cccc}
+\casoBR{0}{0}&\casoBR{0}{1}&\casoBR{0}{2}&\casoBR{0}{3}\\[.35em]
+\casoBR{1}{0}&\casoBR{1}{1}&\casoBR{1}{2}&\casoBR{1}{3}\\[.35em]
+\casoBR{2}{0}&\casoBR{2}{1}&\casoBR{2}{2}&\casoBR{2}{3}\\[.35em]
+\casoBR{3}{0}&\casoBR{3}{1}&\casoBR{3}{2}&\casoBR{3}{3}\end{tabular}\end{center}
+
+\subsection{Existencia del equilibrio de Nash}
+\begin{apuntebox}{Teorema}Todo juego finito $(*)$ en $\Gamma_N$ tiene al menos un EN\end{apuntebox}
+\gris{$(*)$ juego finito: juego $\{\mathcal I,(S_i)_{i=1}^I,(u_i)_{i=1}^I\}$ es finito si $S_i$ es finito $\forall i$.}
+
+\gris{NOTA: Bertrand, por ej. es un juego NO finito.}
+
+Es un argumento de punto fijo. Fun fact: Von Neumann le dijo a Nash: ``You know, that's just a fixed point theorem. What's the use of it?''
+
+Veamos resultados para juegos no finitos
+
+\begin{apuntebox}{Teorema (Glicksberg)}Todo juego en forma estratégica en el que
+\begin{enumerate}\item $S_i\ne\varnothing\wedge$ compacto $\forall i$
+\item $u_i(\cdot)$ es continua en $s=(s_i,s_{-i})\ \forall i$\end{enumerate}
+tiene al menos un EN \gris{(puede ser en mixtas)}\end{apuntebox}
+\begin{apuntebox}{Teorema (Debreu-Glicksberg-Fan)}Todo juego en forma estratégica en el que
+\begin{enumerate}\item $S_i\ne\varnothing$, compacto y cvx $\forall i$
+\item $u_i(\cdot)$ es continua en $s\wedge$ cuasicóncava en $s_i$\end{enumerate}
+tiene al menos un EN en puras.\end{apuntebox}
+\gris{Dejamos de ``refinar'': Se pasa a un conjunto de sol. $+$ grande.}
+
+\section{Equilibrios correlacionados}
+\subsection{Coordinación mediante señales}
+
+Idea: jugadores observan una señal PÚBLICA antes de elegir, lo que les permite coordinar sus elecciones con el resto de los jugadores.
+
+Hasta ahora, sólo podían elegir su $\sigma_i$ de manera independiente.
+
+Batalla de los sexos como motivación para eqs. cor.:
+
+\matriz{cc}{&$F$&$C$}{$F$&$(2,1)$&$(0,0)$\\$C$&$(0,0)$&$(1,2)$}
+$\to$ Los Payoffs generados por los EN son $(2,1)$, $(1,2)$ y $(2/3,2/3)$.
+
+Imaginemos que los agentes observan una ``señal aleatoria'' y la usan para \rojo{coordinar sus elecciones}.
+
+$\to$ Por ejemplo, un tercero lanza una moneda y si sale cara (ceca) ambos juegan $F$ ($C$).
+
+$\to$ Aparece un ``equilibrio'': Nadie quiere desviarse, y los pagos son $(3/2,3/2)$.
+\gris{$\Rightarrow U_i(\widehat\sigma_i)=\tfrac12\cdot2+\tfrac12\cdot1=\tfrac32$.}
+\begin{center}\begin{tikzpicture}[scale=2]
+\draw[->](0,0)--(2.5,0)node[right]{$u_1$};\draw[->](0,0)--(0,2.5)node[above]{$u_2$};
+\foreach\xx/\yy/\lab in {1/2/{},2/1/{},.6667/.6667/{}}{\fill(\xx,\yy)circle(1.7pt);}
+\fill[purpleink](1.5,1.5)circle(2pt);\foreach\v/\lab in {.6667/{2/3},1/{1},1.5/{3/2},2/{2}}{\draw(\v,0)--(\v,-.04)node[below]{$\lab$};\draw(0,\v)--(-.04,\v)node[left]{$\lab$};}
+\end{tikzpicture}\end{center}
+Pero existen más posibilidades, la señal común puede ser ``interpretada'' de manera distinta.
+
+\subsection{Definición del equilibrio correlacionado}
+Generalizamos\ldots
+
+\begin{apuntebox}{Definición. Equilibrio correlacionado}
+Para un juego en forma estratégica $\{\mathcal I,(S_i)_{i=1}^I,(u_i)_{i=1}^I\}$, un \rojo{equilibrio correlacionado} consiste en:
+\begin{enumerate}\item Una terna $\{\Omega,(H_i)_{i=1}^I,p\}$
+\begin{itemize}\item $\Omega=$ espacio de estados finito para la señal
+\gris{$\to\Omega_{MONEDA}=\{Cara,Ceca\}$, $\Omega_{DADO}=\{1,2,3,4,5,6\}$.}
+\item $H_i=$ partición de $\Omega$ para cada $i$
+\gris{$\to$ Dos subconjuntos entre los que $i$ distingue, por ejemplo, $\{1,2,3\}$, $\{4,5,6\}$.}
+\item $p=$ distribución de probabilidad sobre $\Omega$ ($\forall i$)\end{itemize}
+\item Un perfil de estrategias $\widehat\sigma^*=(\widehat\sigma_1^*,\ldots,\widehat\sigma_I^*)$ tal que
+\[\widehat\sigma_i:\Omega\to\Delta(S_i)\quad\text{con }\widehat\sigma_i\in\widehat\Sigma_i.\]
+\gris{Lo que observa de la señal; espacio de estrategias puras.}\quad\rojo{conj. de estrategias puras $i$ definidas sobre $H_i$.}
+\gris{La estrategia ve un elemento de omega y juega una estrategia del jugador $i$.}\end{enumerate}
+\end{apuntebox}
+
+
+Más notación:
+\begin{itemize}\item $\omega$ es un elemento de $\Omega$ \gris{($\{1\}$ para el dado)}
+\item $h_i$ es un elemento de $H_i$ \gris{($\{1,2,3\}$ en el ejemplo)}\end{itemize}
+$\widehat\sigma_i$ cumple que:
+\[\widehat\sigma_i(\omega')=\widehat\sigma_i(\omega'')\quad\text{si }\omega',\omega''\in h_i.\]
+\gris{Si están en el mismo ``conjunto informativo'', la estrategia es la misma.}
+
+\gris{Ej. $\Omega=\{1,2,3,4,5,6\}$, $H_1=\{\{1,2,3\},\{4,5,6\}\}$
+\[\Rightarrow\widehat\sigma_1=\begin{cases}F&\text{si }\omega\in\{1,2,3\}\\C&\text{si }\omega\in\{4,5,6\}.\end{cases}\]}
+$\widehat\sigma_i$ cumple:
+\begin{apuntebox}{}\begin{multline*}\sum_{\omega\in\Omega}p(\omega)u_i(\widehat\sigma_i^*(\omega),\widehat\sigma_{-i}^*(\omega))\\\ge\sum_{\omega\in\Omega}p(\omega)u_i(\widehat\sigma_i(\omega),\widehat\sigma_{-i}^*(\omega))\quad\forall\widehat\sigma_i\in\widehat\Sigma_i.\end{multline*}\end{apuntebox}
+NOTA:
+\begin{itemize}\item Cualquier EN es un caso particular de equilibrio correlac.
+\item Eq. correlac. es un caso particular de EBN \gris{(estát. c info. incompleta)}\end{itemize}
+\subsection{Señales públicas y posibilidades de coordinación}
+\begin{apuntebox}{Definición. Señales puramente públicas}
+Decimos que los jugadores emplean señales puramente públicas si $H_i=H_j\ \forall i=j$.
+\end{apuntebox}
+
+
+$\to$ Todos saben lo mismo sobre la señal.
+
+2 casos:
+
+\rojo{Si emplean señales puramente públicas} $\Rightarrow$ Eq. cor. pueden lograr cualquier vector de pagos en la cápsula cvx de EN.
+\begin{center}\begin{tikzpicture}[scale=1.4]
+\draw[->](0,0)--(3.8,0)node[right]{$u_1$};\draw[->](0,0)--(0,2.5)node[above]{$u_2$};\fill[paleblue](.5,2)--(1,.5)--(3.3,1)--cycle;\draw[inkblue,thick](.5,2)--(1,.5)--(3.3,1)--cycle;
+\foreach\xx/\yy/\lab in {.5/2/{EN_3},1/.5/{EN_2},3.3/1/{EN_1}}{\fill[inkblue](\xx,\yy)circle(1.8pt);\node[above right,inkblue]at(\xx,\yy){$\lab$};}\node[inkblue]at(2,1.7){Cápsula convexa};
+\end{tikzpicture}\end{center}
+\rojo{Si NO emplean señales puramente públicas} $\Rightarrow$ Eq. cor. pueden lograr pagos fuera de la cápsula cvx.
+\begin{center}\begin{tikzpicture}[scale=1.4]
+\draw[->](0,0)--(3.8,0)node[right]{$u_1$};\draw[->](0,0)--(0,2.5)node[above]{$u_2$};\fill[paleblue](.5,1.7)--(.8,.5)--(2, .8)--cycle;\draw[inkblue,thick](.5,1.7)--(.8,.5)--(2,.8)--cycle;\node[inkblue,above]at(.5,1.7){$EN_3$};\node[inkblue,below]at(.8,.5){$EN_2$};\node[inkblue,right]at(2,.8){$EN_1$};\fill[purpleink](2.5,1.7)circle(2pt);
+\end{tikzpicture}\end{center}
+\end{document}
